@@ -59,15 +59,18 @@ contract ReclaimNftAuction {
         _fractionToken.transferFrom(msg.sender, address(this), _amount);
    }
 
-    function unstakeTokens(baseFractionToken _fractionToken, uint _amount) public {
-        ERC721 Nft = _fractionToken.NFT;
-        uint NftId = _fractionToken.NftId;
+    function unstakeTokens(address _fractionTokenAddress, uint _amount) public {
+        baseFractionToken FractionToken = baseFractionToken(_fractionTokenAddress);
+        ERC721 Nft = FractionToken.NFT;
+        uint NftId = FractionToken.NftId;
 
-        require(storageContract.isNftActive(Nft, NftId) == true, "tokens do not have an active NFT");
-        require(tokenBalances[_fractionToken][msg.sender] <= _amount && _amount > 0, "you dont have enough tokens");
+        require(storageContract.getIsNftFractionalised, "NFT is not fractionalise");
+        require(isNftInProposal[Nft][NftId] == false, "NFT is in proposal");
+        require(isNftInAuction[Nft][NftId] == false, "NFT is in auction");
+        require(tokenBalances[_fractionToken][msg.sender] <= _amount, "you dont have enough tokens");
     
         tokenBalances[msg.sender][_fractionToken] -= _amount;
-        _tokens.transfer(msg.sender, _amount);
+        FractionToken.transfer(msg.sender, _amount);
     }
 
     function updateNftOwner(ERC721 _Nft, uint _NftId, address _newOwner) public {
