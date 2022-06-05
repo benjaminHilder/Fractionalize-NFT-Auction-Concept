@@ -9,7 +9,7 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     address StorageContractAddress;
     uint RoyaltyPercentage;
 
-    ERC721 Nft;
+    address NftAddress;
     uint NftId;
 
     address[] tokenOwners;
@@ -17,8 +17,8 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     bool internal noLongerFractionToken;
     mapping(address => bool) isHolding;
 
-    constructor(ERC721 _nft, uint _nftId, address _nftOwner, string memory _tokenName, string memory _tokenTicker, uint _supply, uint _royaltyPercentage, address _storageContractAddress) ERC20(_tokenName, _tokenTicker) {
-    Nft = _nft;
+    constructor(address _nftAddress, uint _nftId, address _nftOwner, string memory _tokenName, string memory _tokenTicker, uint _supply, uint _royaltyPercentage, address _storageContractAddress) ERC20(_tokenName, _tokenTicker) {
+    NftAddress = _nftAddress;
     NftId = _nftId;
     NFTOwner = _nftOwner;
     RoyaltyPercentage = _royaltyPercentage;
@@ -99,8 +99,8 @@ contract baseFractionToken is ERC20, ERC20Burnable {
         return noLongerFractionToken;
     }
 
-    function getNft() public view returns(ERC721) {
-        return Nft;
+    function getNftAddress() public view returns(address) {
+        return NftAddress;
     }
 
     function getNftId() public view returns(uint) {
