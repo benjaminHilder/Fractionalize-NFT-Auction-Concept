@@ -3,7 +3,7 @@ pragma solidity 0.8.14;
 import './FractionToken.sol';
 import './Storage.sol';
 
-contract ReclaimNftAuction {
+contract Auction {
     uint DEFAULT_WAIT_TIME = 259200; // 3 days;
 
     enum Action{Proposal, Auction}
@@ -11,13 +11,14 @@ contract ReclaimNftAuction {
     Storage storageContract;
 
     constructor(address _storageContractAddress) {
-        storageContract = MainContract(_storageContractAddress);
+        storageContract = Storage(_storageContractAddress);
     }
 
     mapping(baseFractionToken => mapping(address => uint)) tokenBalances;
 
     mapping(ERC721 => mapping(uint => bool)) isNftInProposal;
     mapping(ERC721 => mapping(uint => uint)) nftProposalStartPrice;
+    mapping(ERC721 => mapping(uint => address)) proposalInitiator;
     mapping(ERC721 => mapping(uint => uint)) proposalFinishTime;
     mapping(ERC721 => mapping(uint => uint)) totalVoted;
     mapping(ERC721 => mapping(uint => uint)) score;
@@ -37,39 +38,30 @@ contract ReclaimNftAuction {
     mapping (address => mapping(uint => bool)) hasVotedInAuction;
     mapping (address => mapping(uint => bool)) voteValueInAuction;
 
-    modifier isProposalOrAuctionNotActive(baseFractionToken token) {
-        buyoutProposal[] memory proposals = AllVotingInfo[token].proposals;
-        buyoutAuction[] memory auctions = AllVotingInfo[token].auctions;
-
-        require(proposals[proposals.length].active == false, "Token already in proposal");
-        require(auctions[auctions.length].active == false, "Token already in auction");
-        _;
-    }
-
    function stakeTokens(baseFractionToken _fractionToken, uint _amount) public {
         //user needs to approve this contract to send its tokens
 
-        ERC721 NFT = _fractionToken.NFT;
-        uint NftId = _fractionToken.NftId;
+        ERC721 nft = _fractionToken.getNft();
+        uint nftId = _fractionToken.getNftId();
 
-        require(storageContract.isNftActive(Nft, NftId) == true, "tokens do not have an active NFT");
+        require(storageContract.isNftActive(nft, nftId) == true, "tokens do not have an active NFT");
         require(_fractionToken.balanceOf(msg.sender) <= _amount && _amount > 0, "you dont have enough tokens");
 
-        tokenBalances[msg.sender][_fractionToken] += _amount;
+        tokenBalances[_fractionToken][msg.sender] += _amount;
         _fractionToken.transferFrom(msg.sender, address(this), _amount);
    }
 
     function unstakeTokens(address _fractionTokenAddress, uint _amount) public {
         baseFractionToken FractionToken = baseFractionToken(_fractionTokenAddress);
-        ERC721 Nft = FractionToken.NFT;
-        uint NftId = FractionToken.NftId;
+        ERC721 Nft = FractionToken.getNft();
+        uint NftId = FractionToken.getNftId();
 
-        require(storageContract.getIsNftFractionalised, "NFT is not fractionalise");
+        require(storageContract.getIsNftFractionalised(Nft, NftId), "NFT is not fractionalise");
         require(isNftInProposal[Nft][NftId] == false, "NFT is in proposal");
         require(isNftInAuction[Nft][NftId] == false, "NFT is in auction");
-        require(tokenBalances[_fractionToken][msg.sender] <= _amount, "you dont have enough tokens");
+        require(tokenBalances[FractionToken][msg.sender] <= _amount, "you dont have enough tokens");
     
-        tokenBalances[msg.sender][_fractionToken] -= _amount;
+        tokenBalances[FractionToken][msg.sender] -= _amount;
         FractionToken.transfer(msg.sender, _amount);
     }
 
@@ -79,14 +71,15 @@ contract ReclaimNftAuction {
         address(storageContract).delegatecall(abi.encodeWithSignature("SetNftOwner", _Nft, _NftId, _newOwner));
     }
 
-    function startProposal(ERC721 _nft, uint _nftId, uint _startPrice, uint _stakeAmount) isProposalOrAuctionNotActive(_token) public{
+    function startProposal(ERC721 _nft, uint _nftId, uint _startPrice, uint _stakeAmount) public{
         require(storageContract.getNftOwner(_nft, _nftId) == msg.sender);
         require(storageContract.getIsNftFractionalised(_nft, _nftId) == true, "This NFT is not fractionalise");
         
         baseFractionToken FractionToken = baseFractionToken(storageContract.getFractionAddressFromNft(_nft, _nftId));
         require(FractionToken.balanceOf(msg.sender) <= _stakeAmount, "Your vote amount was too large");
-
+        
         isNftInProposal[_nft][_nftId] = true;
+        proposalInitiator[_nft][_nftId] = msg.sender;
         nftProposalStartPrice[_nft][_nftId] = _startPrice;
         proposalFinishTime[_nft][_nftId] = block.timestamp + DEFAULT_WAIT_TIME;
 
@@ -99,12 +92,11 @@ contract ReclaimNftAuction {
         baseFractionToken FractionToken = baseFractionToken(storageContract.getFractionAddressFromNft(_nft, _nftId));
 
         require(isNftInProposal[_nft][_nftId] == true, "There is no proposal active for this NFT");
-        require (hasVotedInProposal[_nft][_nftId] == false, "this user has already voted");
         require (FractionToken.balanceOf(msg.sender) <= _voteAmount, "You don't own enough tokens");
 
-        if (block.timestamp < proposalFinishedTime[_nft][_nftId]) {
+        if (block.timestamp < proposalFinishTime[_nft][_nftId]) {
            
-            stakeTokens(FractionToken, _amount);
+            stakeTokens(FractionToken, _voteAmount);
             
                 totalVoted[_nft][_nftId] += _voteAmount;
             if (_voteValue == true) {
@@ -114,16 +106,23 @@ contract ReclaimNftAuction {
             }
         }
 
-        uint supply = StorageContract.getNftFractionSupply[_nft][_nftId];
+        uint supply = FractionToken.totalSupply();
           // percentage agree
         if(totalVoted[_nft][_nftId] >= supply/2) {
             if (score[_nft][_nftId] >= supply/2) {
-                startAuction(_nft, _nftId);
+                startAuction(_nft, _nftId, proposalFinishTime[_nft][_nftId]);
+
+                isNftInProposal[_nft][_nftId] = false;
+                proposalFinishTime[_nft][_nftId] = 0;
+                totalVoted[_nft][_nftId] = 0;
+                score[_nft][_nftId] = 0;
+
             } else {
                 isNftInProposal[_nft][_nftId] = false;
-                proposalFinishTime = 0;
-                totalVoted = 0;
-                score = 0;
+                proposalFinishTime[_nft][_nftId] = 0;
+                totalVoted[_nft][_nftId] = 0;
+                score[_nft][_nftId] = 0;
+                proposalInitiator[_nft][_nftId] = 0x000000000000000000000000000000000000dEaD;
             }
         }
     }
@@ -135,10 +134,11 @@ contract ReclaimNftAuction {
 
         isNftInAuction[_nft][_nftId] = true;
 
-        auctionCurrentBid[_nft][_nftId] = nftProposalBuyoutStart[_nft][_nftId];
-        nftProposalBuyoutStart[_nft][_nftId] = 0;
+        auctionCurrentBid[_nft][_nftId] = nftProposalStartPrice[_nft][_nftId];
+        nftProposalStartPrice[_nft][_nftId] = 0;
 
-        newAuction.currentBidLeader = storageContract.getNftOwner(_nft, _nftId);
+        auctionCurrentLeader[_nft][_nftId] = proposalInitiator[_nft][_nftId];
+        proposalInitiator[_nft][_nftId] = 0x000000000000000000000000000000000000dEaD;
     }
 
     function bidOnAuction(ERC721 _nft, uint _nftId) public payable {
@@ -153,13 +153,13 @@ contract ReclaimNftAuction {
             canWithdrawEthInContract[_nft][_nftId][auctionCurrentLeader[_nft][_nftId]] = true;
 
             canWithdrawEthInContract[_nft][_nftId][msg.sender] = false;
-            auctionCurrentLeader = msg.sender;
+            auctionCurrentLeader[_nft][_nftId] = msg.sender;
             auctionCurrentBid[_nft][_nftId] = msg.value;
             ethInContract[_nft][_nftId][msg.sender] = msg.value;
             
         } else {
             isNftInAuction[_nft][_nftId] = false;
-            pricePerToken[FractionToken] = auctionCurrentBid / FractionToken.totalSupply();
+            pricePerToken[FractionToken] = auctionCurrentBid[_nft][_nftId] / FractionToken.totalSupply();
             applyWinnings(_nft, _nftId);
        }
     }
@@ -167,15 +167,16 @@ contract ReclaimNftAuction {
     function applyWinnings(ERC721 _nft, uint _nftId) internal {
         storageContract.setIsNftChangingOwnerTrue(_nft, _nftId);
         storageContract.setNftOwner(_nft, _nftId, auctionCurrentLeader[_nft][_nftId]);
+        baseFractionToken FractionToken = baseFractionToken(storageContract.getFractionAddressFromNft(_nft, _nftId));
+
+        FractionToken.setNoLongerFractionTokenTrue();
     }
 
     function claimFromBuyoutTokens(address FractionTokenAddress) public  {
-        require(isNftInProposal[_nft][_nftId] == false, "NFT in proposal");
-        require(isNftInAuction[_nft][_nftId] == false, "NFT in auction");
-
         baseFractionToken FractionToken = baseFractionToken(FractionTokenAddress);
+        require(FractionToken.getNoLongerFractionToken() == true, "This token is still active as a fraction token for an NFT");
+
         uint balance = tokenBalances[FractionToken][msg.sender] + FractionToken.balanceOf(msg.sender);
-    
         require(balance > 0, "You have 0 tokens");
 
         //contact must be approved

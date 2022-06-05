@@ -4,12 +4,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import './FractionToken.sol';
 
-contract MainContract is IERC721Receiver {
+contract Storage is IERC721Receiver {
     mapping(ERC721 => mapping(uint => bool)) isNftDeposited;
     mapping(ERC721 => mapping(uint => address)) nftOwner;
     mapping(ERC721 => mapping(uint => bool)) isNftChangingOwner;
 
-    
     mapping(ERC721 => mapping(uint => bool)) isNftFractionalised;
     mapping(ERC721 => mapping(uint => address)) fractionTokenAddressFromNft;
     mapping(baseFractionToken => address) nftAddressFromFraction;
@@ -18,7 +17,6 @@ contract MainContract is IERC721Receiver {
     address contractDeployer;
 
     constructor() {
-        depositsMade = 0;
         contractDeployer = msg.sender;
     }
 
@@ -35,9 +33,9 @@ contract MainContract is IERC721Receiver {
         nftOwner[_nft][_nftId] = newOwner;
     }
 
-    function isNftActive(ERC721 _Nft, uint _nftId) public view returns(bool) {
-        bool hasDeposited = hasNftDeposited[_Nft][_nftId];
-        bool hasFractionalise = hasNftFractionalised[_Nft][_nftId];
+    function isNftActive(ERC721 _nft, uint _nftId) public view returns(bool) {
+        bool hasDeposited = isNftDeposited[_nft][_nftId];
+        bool hasFractionalise = isNftFractionalised[_nft][_nftId];
         if (hasDeposited && hasFractionalise) {
             return true;
         } else {
@@ -45,15 +43,14 @@ contract MainContract is IERC721Receiver {
         }
     }
 
-    function depositNft(address _NftContractAddress, uint256 _NftId) public {
+    function depositNft(address _nftContractAddress, uint256 _nftId) public {
         // this contract must be approved first
 
-        ERC721 Nft = ERC721(_NftContractAddress);
-        Nft.safeTransferFrom(msg.sender, address(this), _NftId);
+        ERC721 nft = ERC721(_nftContractAddress);
+        nft.safeTransferFrom(msg.sender, address(this), _nftId);
     
-        isNftDeposited[Nft][NftId] = true;
-        nftOwner[Nft][NftId] = msg.sender;
-        canNftBeWithdrawn[Nft][NftId] = msg.sender;
+        isNftDeposited[nft][_nftId] = true;
+        nftOwner[nft][_nftId] = msg.sender;
     }
 
     function createFraction(
@@ -70,7 +67,7 @@ contract MainContract is IERC721Receiver {
 
         isNftFractionalised[nft][_nftId] = true;
 
-        baseFractionToken FractionToken = new baseFractionToken(_nft,
+        baseFractionToken FractionToken = new baseFractionToken(nft,
                                                                 _nftId,
                                                                 msg.sender,
                                                                 _tokenName,
@@ -85,7 +82,7 @@ contract MainContract is IERC721Receiver {
 
      function withdrawNft(address _nftContractAddress, uint256 _nftId) public {
         ERC721 nft = ERC721(_nftContractAddress);
-        baseFractionToken FractionToken = baseFractionToken(fractionTokenAddressFromNft[_nft][_nftId]);
+        baseFractionToken FractionToken = baseFractionToken(fractionTokenAddressFromNft[nft][_nftId]);
         
         require(isNftDeposited[nft][_nftId] == true, "This NFT is not withdrawn");
         require(isNftFractionalised[nft][_nftId] == false ||
@@ -102,7 +99,7 @@ contract MainContract is IERC721Receiver {
     function getIsChangingNftOwner(ERC721 _nft, uint _nftId) public view returns(bool) {
         return isNftChangingOwner[_nft][_nftId];
     }
-    function getFractionTokenAddressFromNft(ERC721 _nft, uint _nftId) public view returns(address) {
+    function getFractionAddressFromNft(ERC721 _nft, uint _nftId) public view returns(address) {
         return fractionTokenAddressFromNft[_nft][_nftId];
     }
     function getNftIdFromFraction(baseFractionToken _fractionToken) public view returns (uint) {
@@ -121,12 +118,8 @@ contract MainContract is IERC721Receiver {
         return isNftFractionalised[_nft][_nftId];
     }
 
-    function getNftFractionSupply(ERC721 _nft, uint _nftId) public view returns(uint) {
-        return nftFractionSupply[_nft][_nftId];
-    }
-
     function setIsNftChangingOwnerTrue(ERC721 _nft, uint _nftId) public {
-        require(msg.sender == nftOwner[_nft][_nftid], "You are not the owner of this NFT");
+        require(msg.sender == nftOwner[_nft][_nftId], "You are not the owner of this NFT");
         isNftChangingOwner[_nft][_nftId] = true;
     }
 

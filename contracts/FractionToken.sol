@@ -9,19 +9,22 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     address StorageContractAddress;
     uint RoyaltyPercentage;
 
-    ERC721 public NFT;
-    uint public NftId;
+    ERC721 Nft;
+    uint NftId;
 
     address[] tokenOwners;
+
+    bool internal noLongerFractionToken;
     mapping(address => bool) isHolding;
 
     constructor(ERC721 _nft, uint _nftId, address _nftOwner, string memory _tokenName, string memory _tokenTicker, uint _supply, uint _royaltyPercentage, address _storageContractAddress) ERC20(_tokenName, _tokenTicker) {
-    NFT = _nft;
+    Nft = _nft;
     NftId = _nftId;
-    NFTOwner = _nFTOwner;
+    NFTOwner = _nftOwner;
     RoyaltyPercentage = _royaltyPercentage;
-    _mint(_NFTOwner, _supply);
+    _mint(NFTOwner, _supply);
     StorageContractAddress = _storageContractAddress;
+    noLongerFractionToken = false;
     }
 
     function transfer(address to, uint256 amount) override public returns (bool) {
@@ -63,6 +66,11 @@ contract baseFractionToken is ERC20, ERC20Burnable {
         _burn(_msgSender(), amount);
     }
 
+    function setNoLongerFractionTokenTrue() public {
+        require(msg.sender == StorageContractAddress, "This function can only be called from the storage contract");
+        noLongerFractionToken = true;
+    }
+
     function addNewUserRemoveOld(address newUser, address oldUser) public{
         tokenOwners.push(newUser);
         isHolding[newUser] = true;
@@ -82,9 +90,21 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     }
 
     function updateNFTOwner(address _newOwner) public {
-        require(msg.sender == VaultContractAddress, "Only vault contract can update this nft owner");
+        require(msg.sender == StorageContractAddress, "only storage contract can update this");
 
         NFTOwner = _newOwner;
+    }
+    
+    function getNoLongerFractionToken() public view returns(bool) {
+        return noLongerFractionToken;
+    }
+
+    function getNft() public view returns(ERC721) {
+        return Nft;
+    }
+
+    function getNftId() public view returns(uint) {
+        return NftId;
     }
 
     function returnTokenOwners() public view returns(address[] memory) {
