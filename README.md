@@ -2,6 +2,7 @@
 *Under construction
 
 This version has an implementation of withdrawing an NFT via an auction system (if you do not own all ERC20 fraction tokens).
+inspired by https://fractional.art/
 
 Original dapp: https://github.com/benjaminHilder/Fractionalise-NFT
 
@@ -18,4 +19,3 @@ metamask
 react
 openzeppelin
 
-inspired by https://fractional.art/
