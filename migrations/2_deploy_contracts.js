@@ -7,6 +7,6 @@ const AuctionContract = artifacts.require("Auction");
 module.exports = async function (deployer, _network, accounts) {
     await deployer.deploy(StorageContract);
     await deployer.deploy(NFTContract);
-    await deployer.deploy(AuctionContract)
-    //await deployer.deploy(accounts[0], 8, 800, "tokenName", "TT", MainContract);
+
+    await deployer.deploy(AuctionContract, StorageContract.address )
 }
