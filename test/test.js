@@ -163,16 +163,82 @@ contract ('ReclaimNftAuction', (accounts) => {
 
         await auctionContract.voteOnProposal(nftContract.address, iterator, true, 1, {from: accounts[0]});
 
-        let amount = await auctionContract.getAmount();
-        await console.log("amount " + amount);
-        
-        let totalVoted = await auctionContract.getProposalTotalVoted[nftContract.address][iterator];
-        //assert(totalVoted == 1);
-        console.log("total voted: " + totalVoted)
+        let totalVoted = await auctionContract.getProposalTotalVoted(nftContract.address,iterator);
+        assert(totalVoted == 101);
 
-        let score = await auctionContract.getProposalScore[nftContract.address][iterator];
-        console.log("score: "+ score)
-        //assert(score == 101);
+        let score = await auctionContract.getProposalScore(nftContract.address,iterator);
+        assert(score == 101);
+
+        await fractionInstance.approve(auctionContract.address, 1, {from: accounts[1]})  
+        await auctionContract.stakeTokens(fractionAddress, 1, {from: accounts[1]})
+
+        await auctionContract.voteOnProposal(nftContract.address, iterator, false, 1, {from: accounts[1]});
+        
+        score = await auctionContract.getProposalScore(nftContract.address,iterator);
+        totalVoted = await auctionContract.getProposalTotalVoted(nftContract.address,iterator);
+        assert(score == 100);
+        assert(totalVoted == 102);
     })
+
+    it('should be able to start an auction when 50% of tokens vote yes for an auction', async() => {
+        await fractionInstance.approve(auctionContract.address, 8000, {from: accounts[0]})  
+        await auctionContract.stakeTokens(fractionAddress, 8000, {from: accounts[0]})
+
+        await auctionContract.startProposal(nftContract.address, iterator, 2, 20, 100, {from: accounts[0]});
+
+        await auctionContract.voteOnProposal(nftContract.address, iterator, true, 4000, {from: accounts[0]});
+
+        let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
+        assert(isNftInAuction == true);
+
+        let IsNftInProposal = await auctionContract.getIsNftInProposal(nftContract.address, iterator);
+        assert(IsNftInProposal == false);
+    })
+
+    it('should reset all proposal variables when an auction starts', async() => {
+        await fractionInstance.approve(auctionContract.address, 8000, {from: accounts[0]})  
+        await auctionContract.stakeTokens(fractionAddress, 8000, {from: accounts[0]})
+
+        await auctionContract.startProposal(nftContract.address, iterator, 2, 20, 100, {from: accounts[0]});
+
+        await auctionContract.voteOnProposal(nftContract.address, iterator, true, 4000, {from: accounts[0]});
+
+        let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
+        assert(isNftInAuction == true);
+
+        let IsNftInProposal = await auctionContract.getIsNftInProposal(nftContract.address, iterator);
+        assert(IsNftInProposal == false);
+
+        let proposalFinishTime = await auctionContract.getProposalFinishTime(nftContract.address, iterator);
+        assert(proposalFinishTime == 0)
+
+        let totalVoted = await auctionContract.getProposalTotalVoted(nftContract.address,iterator);
+        assert(totalVoted == 0);
+
+        let score = await auctionContract.getProposalScore(nftContract.address, iterator);
+        assert(score == 0);
+
+        let nftProposalStartPrice = await auctionContract.getProposalStartPrice(nftContract.address, iterator);
+        assert(nftProposalStartPrice == 0);
+
+        //figure out how to test this or change the default address to another
+        //let proposalInitiator = await auctionContract.getProposalInitiator(nftContract, iterator);
+        //assert(proposalInitiator == "0x000000000000000000000000000000000000dEaD")
+    })
+
+    it ('should be able to bid on an auction', async() => {
+        await fractionInstance.approve(auctionContract.address, 8000, {from: accounts[0]})  
+        await auctionContract.stakeTokens(fractionAddress, 8000, {from: accounts[0]})
+
+        await auctionContract.startProposal(nftContract.address, iterator, 2, 20, 100, {from: accounts[0]});
+
+        await auctionContract.voteOnProposal(nftContract.address, iterator, true, 4000, {from: accounts[0]});
+
+        let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
+        assert(isNftInAuction == true);
+
+        web3.eth.sendTransaction({to:await auctionContract.bidOnAuction(nftContract.address, iterator), from: accounts[0], value: 300000000000000000000000000000})
+    })
+
 
 })

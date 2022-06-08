@@ -131,7 +131,7 @@ contract Auction {
     }
 
     function startAuction(address _nftAddress, uint _nftId, uint _auctionTime) public {
-        require(_auctionTime < DEFAULT_WAIT_TIME, "Set auction time lower than max");
+        require(_auctionTime < block.timestamp + DEFAULT_WAIT_TIME, "Set auction time lower than max");
 
         auctionFinishTime[_nftAddress][_nftId] = _auctionTime;
 
