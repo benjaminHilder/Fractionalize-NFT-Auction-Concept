@@ -1,21 +1,15 @@
-### Fractionalise NFT to ERC20 Tokens
-*Under construction
+# Basic Sample Hardhat Project
 
-This version has an implementation of withdrawing an NFT via an auction system (if you do not own all ERC20 fraction tokens).
-inspired by https://fractional.art/
+This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
 
-Original dapp: https://github.com/benjaminHilder/Fractionalise-NFT
+Try running some of the following tasks:
 
-Turn an ERC271 into multiple ERC20. ERC20 can then be used to other dapps that use ERC20 tokens for example uniswap. Coming soon: Auction to un-fractionalise your NFT
-
-
-What I used to develop it:
-nodejs
-npm
-solidity
-javascript
-truffle
-metamask
-react
-openzeppelin
-
+```shell
+npx hardhat accounts
+npx hardhat compile
+npx hardhat clean
+npx hardhat test
+npx hardhat node
+node scripts/sample-script.js
+npx hardhat help
+```
