@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { time, balance } = require('@openzeppelin/test-helpers');
+const { time, balance, expectRevert } = require('@openzeppelin/test-helpers');
 
 require("@nomiclabs/hardhat-waffle");
 
@@ -248,17 +248,30 @@ describe("Auction", function () {
         //assert(proposalInitiator == "0x000000000000000000000000000000000000dEaD")
     })  
       it ('should be able to bid on an auction', async() => {
-          await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
-          await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)
+            await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
+            await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)
 
-          await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
+            await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
 
-          await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
+            await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
 
-          let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
-          expect(isNftInAuction).to.equal(true)
+            let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
+            expect(isNftInAuction).to.equal(true)
 
-          //web3.eth.sendTransaction({to:await auctionContract.bidOnAuction(nftContract.address, iterator), from: accounts[0], value: 300000000000000000000000000000})
-      })
+            let currentBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
+            await console.log("current bid " + currentBid)
+
+            await expectRevert (
+                auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 1}),
+                "VM Exception while processing transaction"
+            )
+            await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 3});
+            
+            let auctionLeader = await auctionContract.getAuctionCurrentLeader(nftContract.address, iterator);
+            let auctionLeadingBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
+        
+            expect(auctionLeader).to.equal(addr1.address);
+            expect(auctionLeadingBid).to.equal(3);
+        })
 
 });

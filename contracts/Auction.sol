@@ -227,6 +227,14 @@ contract Auction {
         return score[_nftAddress][_nftId];
     }
 
+    function getAuctionCurrentLeader(address _nftAddress, uint _nftId) public view returns(address) {
+        return auctionCurrentLeader[_nftAddress][_nftId];
+    }
+
+    function getAuctionCurrentBid(address _nftAddress, uint _nftId) public view returns(uint) {
+        return auctionCurrentBid[_nftAddress][_nftId];
+    }
+
     function getIfNftIsInAuction(address _nftAddress, uint _nftId) public view returns (bool) {
         return isNftInAuction[_nftAddress][_nftId];
     }
