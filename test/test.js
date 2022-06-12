@@ -1,6 +1,6 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
-const { time, balance, expectRevert } = require('@openzeppelin/test-helpers');
+const { ethers, network } = require("hardhat");
+const { balance, expectRevert } = require('@openzeppelin/test-helpers');
 
 require("@nomiclabs/hardhat-waffle");
 
@@ -59,7 +59,6 @@ describe("Auction", function () {
 
         let balanceOfAuction = await fractionInstance.balanceOf(auctionContract.address);
         expect(balanceOfAuction).to.equal(1)
-        //assert (balanceOfAuction == 1)
     })
 
     it ('SHOULD NOT be able to stake more tokens than what the account owns', async() => {
@@ -68,12 +67,6 @@ describe("Auction", function () {
 
         let balanceOfAccount1 = await fractionInstance.balanceOf(addr1.address);
         expect(balanceOfAccount1).to.equal(1)
-
-        try {
-            await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)}
-        catch {
-            console.log("could not send more tokens than owned")}
-
     })
 
     it ('should be able to let an address withdraw their tokens after they stake it in the auction contract', async() => {
@@ -104,10 +97,7 @@ describe("Auction", function () {
         let balanceOfAuctionContract = await fractionInstance.balanceOf(auctionContract.address);
         expect(balanceOfAuctionContract).to.equal(2)
 
-        try { 
-            await auctionContract.connect(owner).unstakeTokens(fractionAddress, 2)}
-        catch {
-            console.log ("could not withdraw more tokens than what was staked")}
+       
     })
 
     it ('should allow a user to start a proposal with an NFT they deposited', async() => {
@@ -247,31 +237,61 @@ describe("Auction", function () {
         //let proposalInitiator = await auctionContract.getProposalInitiator(nftContract, iterator);
         //assert(proposalInitiator == "0x000000000000000000000000000000000000dEaD")
     })  
-      it ('should be able to bid on an auction', async() => {
-            await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
-            await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)
+    it ('should be able to bid on an auction', async() => {
+          await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
+          await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)
+          await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
+          await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
+          
+          let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
+          expect(isNftInAuction).to.equal(true)
 
-            await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
+          let currentBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
+          
+          //await console.log("current bid " + currentBid)
+          await expectRevert (
+              auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 1}),
+              "VM Exception while processing transaction"
+          )
+          await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 3});
+          
+          let auctionLeader = await auctionContract.getAuctionCurrentLeader(nftContract.address, iterator);
+          let auctionLeadingBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
+      
+          expect(auctionLeader).to.equal(addr1.address);
+          expect(auctionLeadingBid).to.equal(3);
+      })
 
-            await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
-
-            let isNftInAuction = await auctionContract.getIfNftIsInAuction(nftContract.address, iterator);
-            expect(isNftInAuction).to.equal(true)
-
-            let currentBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
-            await console.log("current bid " + currentBid)
-
-            await expectRevert (
-                auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 1}),
-                "VM Exception while processing transaction"
-            )
-            await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 3});
+    it ('should allow the auction winner to withdraw the NFT', async() => {
+        await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
+        await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000)
+        await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
+        await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
+    
+        await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, {value: 3});
             
-            let auctionLeader = await auctionContract.getAuctionCurrentLeader(nftContract.address, iterator);
-            let auctionLeadingBid = await auctionContract.getAuctionCurrentBid(nftContract.address, iterator);
+        await storageContract.setAuctionAddress(auctionContract.address);
+
+        let auctionAdd = await storageContract.getAuctionAddress();
+        expect (auctionAdd == auctionContract.address)
+
+        //increase time
+        network.provider.send("evm_increaseTime", [3600]);
+        network.provider.send("evm_mine")
+
+        await auctionContract.applyEndOfAuction(nftContract.address, iterator);
         
-            expect(auctionLeader).to.equal(addr1.address);
-            expect(auctionLeadingBid).to.equal(3);
-        })
+        let isFractionalised = await storageContract.getIsNftFractionalised(nftContract.address, iterator);
+        expect (isFractionalised).to.equal(false);
+
+        //let inAuction = await auctionContract.isAuctionActive(nftContract.address, iterator);
+        //console.log("in auction: " + inAuction)
+
+        await storageContract.connect(addr1).withdrawNft(nftContract.address, iterator);
+//
+        let ownerOfNft = await nftContract.ownerOf(iterator);
+//
+        expect(ownerOfNft).to.equal(addr1.address);
+    })
 
 });

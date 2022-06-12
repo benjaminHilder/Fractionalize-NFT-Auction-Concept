@@ -167,6 +167,15 @@ contract Auction {
        }
     }
 
+    function applyEndOfAuction(address _nftAddress, uint _nftId) public {
+        if (block.timestamp >= auctionFinishTime[_nftAddress][_nftId]) {
+             baseFractionToken FractionToken = baseFractionToken(storageContract.getFractionAddressFromNft(_nftAddress, _nftId));
+             isNftInAuction[_nftAddress][_nftId] = false;
+             pricePerToken[FractionToken] = auctionCurrentBid[_nftAddress][_nftId] / FractionToken.totalSupply();
+             applyWinnings(_nftAddress, _nftId);
+        }
+    }
+
     function updateNftOwner(address _nftAddress, uint _nftId, address _newOwner) public {
         address(storageContract).delegatecall(abi.encodeWithSignature("setIsNftChangingOwner", _nftAddress, _nftId));
         address(storageContract).delegatecall(abi.encodeWithSignature("SetNftOwner", _nftAddress, _nftId, _newOwner));
@@ -175,9 +184,9 @@ contract Auction {
     function applyWinnings(address _nftAddress, uint _nftId) internal {
         storageContract.setIsNftChangingOwnerTrue(_nftAddress, _nftId);
         storageContract.setNftOwner(_nftAddress, _nftId, auctionCurrentLeader[_nftAddress][_nftId]);
-        baseFractionToken FractionToken = baseFractionToken(storageContract.getFractionAddressFromNft(_nftAddress, _nftId));
-
-        FractionToken.setNoLongerFractionTokenTrue();
+       
+        storageContract.setNoLongerFractionTokenTrue(_nftAddress, _nftId);
+        storageContract.disableIsFractionalised(_nftAddress, _nftId);
     }
 
     function claimFromBuyoutTokens(address FractionTokenAddress) public  {
@@ -197,6 +206,10 @@ contract Auction {
 
     function getTimestamp() public view returns(uint) {
         return block.timestamp;
+    }
+
+    function isAuctionActive(address _nftAddress, uint _nftId) public view returns(bool) {
+        return isNftInAuction[_nftAddress][_nftId];
     }
 
     function getAddressTokenBalance(address _fractionTokenAddress, address _user) public view returns(uint){
