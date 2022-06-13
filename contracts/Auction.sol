@@ -6,13 +6,7 @@ import './Storage.sol';
 contract Auction {
     uint DEFAULT_WAIT_TIME = 259200; // 3 days;
 
-    enum Action{Proposal, Auction}
-
-    Storage storageContract;
-
-    constructor(address _storageContractAddress) {
-        storageContract = Storage(_storageContractAddress);
-    }
+    //enum Action{Proposal, Auction}
 
           //fraction         //user
     mapping(address => mapping(address => uint)) tokenBalances;
@@ -39,7 +33,13 @@ contract Auction {
     mapping (address => mapping(uint => bool)) hasVotedInAuction;
     mapping (address => mapping(uint => bool)) voteValueInAuction;
 
-   function stakeTokens(address _fractionAddress, uint _amount) public {
+    Storage storageContract;
+
+    constructor(address _storageContractAddress) {
+        storageContract = Storage(_storageContractAddress);
+    }
+
+    function stakeTokens(address _fractionAddress, uint _amount) public {
         //user needs to approve this contract to send its tokens
 
         baseFractionToken FractionToken = baseFractionToken(_fractionAddress);
@@ -51,9 +51,11 @@ contract Auction {
         require(_amount <= FractionToken.balanceOf(msg.sender), "you dont have enough tokens");
 
         FractionToken.transferFrom(msg.sender, address(this), _amount);
-        tokenBalances[_fractionAddress][msg.sender] += _amount;
         
-   }
+        uint deposit = _amount - FractionToken.getRoyaltyFee(_amount);
+
+        tokenBalances[_fractionAddress][msg.sender] += deposit;
+    }
 
     function unstakeTokens(address _fractionAddress, uint _amount) public {
         baseFractionToken FractionToken = baseFractionToken(_fractionAddress);
@@ -176,11 +178,6 @@ contract Auction {
         }
     }
 
-    function updateNftOwner(address _nftAddress, uint _nftId, address _newOwner) public {
-        address(storageContract).delegatecall(abi.encodeWithSignature("setIsNftChangingOwner", _nftAddress, _nftId));
-        address(storageContract).delegatecall(abi.encodeWithSignature("SetNftOwner", _nftAddress, _nftId, _newOwner));
-    }
-
     function applyWinnings(address _nftAddress, uint _nftId) internal {
         storageContract.setIsNftChangingOwnerTrue(_nftAddress, _nftId);
         storageContract.setNftOwner(_nftAddress, _nftId, auctionCurrentLeader[_nftAddress][_nftId]);
@@ -193,15 +190,15 @@ contract Auction {
         baseFractionToken FractionToken = baseFractionToken(FractionTokenAddress);
         require(FractionToken.getNoLongerFractionToken() == true, "This token is still active as a fraction token for an NFT");
 
-        uint balance = tokenBalances[FractionTokenAddress][msg.sender] + FractionToken.balanceOf(msg.sender);
-        require(balance > 0, "You have 0 tokens");
+       //uint balance = tokenBalances[FractionTokenAddress][msg.sender] + FractionToken.balanceOf(msg.sender);
+       //require(balance > 0, "You have 0 tokens");
 
-        //contact must be approved
+       ////contact must be approved
 
-        FractionToken.transferFrom(msg.sender, address (this), FractionToken.balanceOf(msg.sender));
+       //FractionToken.transferFrom(msg.sender, address (this), FractionToken.balanceOf(msg.sender));
 
-        FractionToken.burn(balance);
-        payable(msg.sender).transfer(pricePerToken[FractionToken] * balance);
+       //FractionToken.burn(balance);
+       //payable(msg.sender).transfer(pricePerToken[FractionToken] * balance);
     }
 
     function getTimestamp() public view returns(uint) {

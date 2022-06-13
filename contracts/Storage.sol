@@ -25,6 +25,11 @@ contract Storage is IERC721Receiver {
         require (msg.sender == contractDeployer, "Only contract deployer can call this function");
         _;
     }
+
+    modifier auctionContractOnly {
+        require(msg.sender == auctionAddress,"only auction can call this function");
+        _;
+    }
     
     function setNftOwner(address _nftAddress, uint _nftId, address newOwner) public {
         require(isNftChangingOwner[_nftAddress][_nftId] == true, "Nft is not changing owner");
@@ -94,18 +99,15 @@ contract Storage is IERC721Receiver {
         nft.safeTransferFrom(address(this), msg.sender, _nftId);
     }
     
-    function disableIsFractionalised(address _nftAddress, uint _nftID) public {
-        require(msg.sender == auctionAddress,"only auction can call this function");
+    function disableIsFractionalised(address _nftAddress, uint _nftID) public auctionContractOnly {
         isNftFractionalised[_nftAddress][_nftID] = false;
     }
 
-    function setAuctionAddress(address _auctionAddress) public {
-        require(msg.sender == contractDeployer, "only contract deployer can call this function");
+    function setAuctionAddress(address _auctionAddress) public contractDeployerOnly {
         auctionAddress = _auctionAddress; 
     }
     
-    function setNoLongerFractionTokenTrue(address _nftAddress, uint _nftId) public {
-        require(msg.sender == auctionAddress,"only auction can call this function");
+    function setNoLongerFractionTokenTrue(address _nftAddress, uint _nftId) public auctionContractOnly {
         baseFractionToken FractionToken = baseFractionToken(getFractionAddressFromNft(_nftAddress, _nftId));
         FractionToken.setNoLongerFractionTokenTrue();
     }

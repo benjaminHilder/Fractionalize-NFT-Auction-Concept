@@ -27,15 +27,35 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     noLongerFractionToken = false;
     }
 
+    //function noFeeStorageTransfer(address from, address to, uint amount ) private{
+    //    uint royaltyFee = amount * RoyaltyPercentage / 100;
+    //    uint afterRoyaltyFee = amount - royaltyFee;
+//
+    //    if(from != StorageContractAddress ||
+    //        to != StorageContractAddress) {
+    //        //send royalty
+    //        _transfer(from, NFTOwner, royaltyFee);
+    //        //send to new owner
+    //        _transfer(from, to, afterRoyaltyFee);
+    //    } else {
+    //        _transfer(from, to, afterRoyaltyFee);
+    //    }
+    //}
+
     function transfer(address to, uint256 amount) override public returns (bool) {
         uint royaltyFee = amount * RoyaltyPercentage / 100;
         uint afterRoyaltyFee = amount - royaltyFee;
         
         address owner = _msgSender();
-        //send royalty
-        _transfer(owner, NFTOwner, royaltyFee);
-        //send to new owner
-        _transfer(owner, to, afterRoyaltyFee);
+        if(_msgSender() != StorageContractAddress ||
+        to != StorageContractAddress) {
+            //send royalty
+            _transfer(owner, NFTOwner, royaltyFee);
+            //send to new owner
+            _transfer(owner, to, afterRoyaltyFee);
+        } else {
+            _transfer(owner, NFTOwner, amount);
+        }
 
         addNewUserRemoveOld(to, owner);
         
@@ -52,10 +72,16 @@ contract baseFractionToken is ERC20, ERC20Burnable {
 
         uint royaltyFee = amount * RoyaltyPercentage / 100;
         uint afterRoyaltyFee = amount - royaltyFee;
+
+        if (_msgSender() != StorageContractAddress ||
+        to != StorageContractAddress) {
         //send royalty
         _transfer(from, NFTOwner, royaltyFee);
         //send to new owner
         _transfer(from, to, afterRoyaltyFee);
+        }  else {
+        _transfer(from, to, amount);
+        }
 
         addNewUserRemoveOld(to, from);
 
@@ -95,6 +121,10 @@ contract baseFractionToken is ERC20, ERC20Burnable {
         NFTOwner = _newOwner;
     }
     
+    function getRoyaltyFee(uint _amount) public view returns(uint) {
+        return _amount * RoyaltyPercentage / 100;
+    }
+
     function getNoLongerFractionToken() public view returns(bool) {
         return noLongerFractionToken;
     }
