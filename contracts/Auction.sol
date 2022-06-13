@@ -1,4 +1,3 @@
-//UNDER DEVELOPNMENT
 pragma solidity 0.8.14;
 import './FractionToken.sol';
 import './Storage.sol';
@@ -52,9 +51,7 @@ contract Auction {
 
         FractionToken.transferFrom(msg.sender, address(this), _amount);
         
-        uint deposit = _amount - FractionToken.getRoyaltyFee(_amount);
-
-        tokenBalances[_fractionAddress][msg.sender] += deposit;
+        tokenBalances[_fractionAddress][msg.sender] += _amount;
     }
 
     function unstakeTokens(address _fractionAddress, uint _amount) public {

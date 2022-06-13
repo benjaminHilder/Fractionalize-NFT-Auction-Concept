@@ -112,6 +112,12 @@ contract Storage is IERC721Receiver {
         FractionToken.setNoLongerFractionTokenTrue();
     }
 
+    function setAuctionAddressInFraction(address _fractionAddress) public {
+        baseFractionToken fraction = baseFractionToken(_fractionAddress);
+
+        fraction.setAuctionContractAddress(auctionAddress);
+    }
+
     function getAuctionAddress() public view returns(address) {
         return auctionAddress;
     }

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract baseFractionToken is ERC20, ERC20Burnable {
     address NFTOwner;
     address StorageContractAddress;
+    address AuctionContractAddress;
     uint RoyaltyPercentage;
 
     address NftAddress;
@@ -27,32 +28,22 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     noLongerFractionToken = false;
     }
 
-    //function noFeeStorageTransfer(address from, address to, uint amount ) private{
-    //    uint royaltyFee = amount * RoyaltyPercentage / 100;
-    //    uint afterRoyaltyFee = amount - royaltyFee;
-//
-    //    if(from != StorageContractAddress ||
-    //        to != StorageContractAddress) {
-    //        //send royalty
-    //        _transfer(from, NFTOwner, royaltyFee);
-    //        //send to new owner
-    //        _transfer(from, to, afterRoyaltyFee);
-    //    } else {
-    //        _transfer(from, to, afterRoyaltyFee);
-    //    }
-    //}
+
+    function _transferWithRoyalty(address _from, address _to, uint256 _amount) public {
+        uint royaltyFee = getRoyaltyFee(_amount);
+        uint afterRoyaltyFee = _amount - royaltyFee;
+
+        _transfer(_from, NFTOwner, royaltyFee);
+        _transfer(_from, _to, afterRoyaltyFee);
+    }
 
     function transfer(address to, uint256 amount) override public returns (bool) {
-        uint royaltyFee = amount * RoyaltyPercentage / 100;
-        uint afterRoyaltyFee = amount - royaltyFee;
-        
         address owner = _msgSender();
-        if(_msgSender() != StorageContractAddress ||
-        to != StorageContractAddress) {
-            //send royalty
-            _transfer(owner, NFTOwner, royaltyFee);
-            //send to new owner
-            _transfer(owner, to, afterRoyaltyFee);
+
+        if(_msgSender() != AuctionContractAddress ||
+            to != AuctionContractAddress) {
+            
+            _transferWithRoyalty(owner, to, amount);
         } else {
             _transfer(owner, NFTOwner, amount);
         }
@@ -70,15 +61,10 @@ contract baseFractionToken is ERC20, ERC20Burnable {
         address spender = _msgSender();
         _spendAllowance(from, spender, amount);
 
-        uint royaltyFee = amount * RoyaltyPercentage / 100;
-        uint afterRoyaltyFee = amount - royaltyFee;
+        if (_msgSender() != AuctionContractAddress ||
+        to != AuctionContractAddress) {
 
-        if (_msgSender() != StorageContractAddress ||
-        to != StorageContractAddress) {
-        //send royalty
-        _transfer(from, NFTOwner, royaltyFee);
-        //send to new owner
-        _transfer(from, to, afterRoyaltyFee);
+        _transferWithRoyalty(from, to, amount);
         }  else {
         _transfer(from, to, amount);
         }
@@ -113,6 +99,12 @@ contract baseFractionToken is ERC20, ERC20Burnable {
                 }
             }
         }
+    }
+
+    function setAuctionContractAddress(address _address) public {
+    require(msg.sender == StorageContractAddress, "only storage contract can update this");
+
+    AuctionContractAddress = _address;
     }
 
     function updateNFTOwner(address _newOwner) public {

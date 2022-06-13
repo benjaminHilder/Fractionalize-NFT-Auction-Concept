@@ -286,7 +286,7 @@ describe("Auction", function () {
             expect(ownerOfNft).to.equal(addr1.address);
         })
 
-        it.only('should give fraction token of a finish auction the right amount when claiming', async () => {
+        it('should give fraction token of a finish auction the right amount when claiming', async () => {
             let prov = await ethers.getDefaultProvider();
 
             await fractionInstance.connect(owner).approve(auctionContract.address, 8000)  
