@@ -82,7 +82,6 @@ contract Storage is IERC721Receiver {
                                                                 _royaltyPercentage,
                                                                 address (this)
         );
-
         fractionTokenAddressFromNft[_nftAddress][_nftId] = address (FractionToken);
     }
 
@@ -95,7 +94,9 @@ contract Storage is IERC721Receiver {
                 FractionToken.balanceOf(msg.sender) == FractionToken.totalSupply()*/, 
                 "NFT cannot be withdrawn, either the NFT has been withdrawn or you do not own the total supply of fraction tokens"
                 );
+        require(nftOwner[_nftAddress][_nftId] == msg.sender, "This address does not own this NFT");
 
+        nftOwner[_nftAddress][_nftId] = 0x0000000000000000000000000000000000000000;
         nft.safeTransferFrom(address(this), msg.sender, _nftId);
     }
     

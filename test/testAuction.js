@@ -433,22 +433,15 @@ describe("Auction functionality", function () {
     await auctionContract
       .connect(owner)
       .startProposal(nftContract.address, iterator, 2, 20, 100);
-    await auctionContract
-      .connect(owner)
-      .voteOnProposal(nftContract.address, iterator, true, 4000);
-    await auctionContract
-      .connect(addr1)
-      .bidOnAuction(nftContract.address, iterator, { value: 3 });
-
+    await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
+    await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, { value: 3 });
     await storageContract.setAuctionAddress(auctionContract.address);
 
     network.provider.send("evm_increaseTime", [3600]);
     network.provider.send("evm_mine");
 
     await auctionContract.applyEndOfAuction(nftContract.address, iterator);
-    await storageContract
-      .connect(addr1)
-      .withdrawNft(nftContract.address, iterator);
+    await storageContract.connect(addr1).withdrawNft(nftContract.address, iterator);
 
     let balanceBefore = await prov.getBalance(owner.address);
     await console.log("Balance before: " + balanceBefore);

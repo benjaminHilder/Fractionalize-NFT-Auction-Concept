@@ -3,8 +3,10 @@ pragma solidity 0.8.14;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-contract baseFractionToken is ERC20, ERC20Burnable {
+
+contract baseFractionToken is  ERC20,  ERC20Burnable {
     address NFTOwner;
     address StorageContractAddress;
     address AuctionContractAddress;
@@ -19,13 +21,13 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     mapping(address => bool) isHolding;
 
     constructor(address _nftAddress, uint _nftId, address _nftOwner, string memory _tokenName, string memory _tokenTicker, uint _supply, uint _royaltyPercentage, address _storageContractAddress) ERC20(_tokenName, _tokenTicker) {
-    NftAddress = _nftAddress;
-    NftId = _nftId;
-    NFTOwner = _nftOwner;
-    RoyaltyPercentage = _royaltyPercentage;
-    _mint(NFTOwner, _supply);
-    StorageContractAddress = _storageContractAddress;
-    noLongerFractionToken = false;
+        NftAddress = _nftAddress;
+        NftId = _nftId;
+        NFTOwner = _nftOwner;
+        RoyaltyPercentage = _royaltyPercentage;
+        _mint(NFTOwner, _supply);
+        StorageContractAddress = _storageContractAddress;
+        noLongerFractionToken = false;
     }
 
 
@@ -115,6 +117,14 @@ contract baseFractionToken is ERC20, ERC20Burnable {
     
     function getRoyaltyFee(uint _amount) public view returns(uint) {
         return _amount * RoyaltyPercentage / 100;
+    }
+
+    function getRoyaltyPercentage() public view returns(uint) {
+        return RoyaltyPercentage;
+    }
+    
+    function getNftOwner() public view returns(address) {
+        return NFTOwner;
     }
 
     function getNoLongerFractionToken() public view returns(bool) {
