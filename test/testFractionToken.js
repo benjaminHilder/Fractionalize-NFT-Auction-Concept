@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe.only("Fraction token functionality", async() => {
+describe("Fraction token functionality", async() => {
     let fractionAddress;
     let FractionToken;
     let fractionInstance
@@ -67,8 +67,19 @@ describe.only("Fraction token functionality", async() => {
         await fractionInstance.connect(addr1).approve(Auction.address, 1000)  
         await Auction.connect(addr1).stakeTokens(fractionAddress, 1000);
 
-       await Auction.connect(addr1).unstakeTokens(fractionAddress, 1000);
-       let balanceOfAccount1 = await fractionInstance.balanceOf(addr1.address);
-       expect(balanceOfAccount1).to.equal(1000);
+        await Auction.connect(addr1).unstakeTokens(fractionAddress, 1000);
+
+        let balanceOfAccount1 = await fractionInstance.balanceOf(addr1.address);
+        expect(balanceOfAccount1).to.equal(1000);
     })
+
+    it("should burn tokens", async() => {
+        await fractionInstance.connect(addr1).burn(100);
+        let balanceOfAccount1 = await fractionInstance.balanceOf(addr1.address);
+        expect(balanceOfAccount1).to.equal(900);
+    })
+
+
+
+    
 })
