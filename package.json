@@ -16,8 +16,11 @@
     "@openzeppelin/test-helpers": "^0.5.15",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
-    "ethers": "^5.0.0",
+    "ethers": "^5.6.8",
     "hardhat": "^2.9.9",
     "web3": "^1.7.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0"
   }
 }
