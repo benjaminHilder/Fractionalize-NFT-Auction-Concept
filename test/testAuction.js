@@ -426,13 +426,9 @@ describe("Auction functionality", function () {
   it("should give fraction token of a finish auction the right amount when claiming", async () => {
     let prov = await ethers.getDefaultProvider();
 
-    await fractionInstance
-      .connect(owner)
-      .approve(auctionContract.address, 8000);
+    await fractionInstance.connect(owner).approve(auctionContract.address, 8000);
     await auctionContract.connect(owner).stakeTokens(fractionAddress, 8000);
-    await auctionContract
-      .connect(owner)
-      .startProposal(nftContract.address, iterator, 2, 20, 100);
+    await auctionContract.connect(owner).startProposal(nftContract.address, iterator, 2, 20, 100);
     await auctionContract.connect(owner).voteOnProposal(nftContract.address, iterator, true, 4000);
     await auctionContract.connect(addr1).bidOnAuction(nftContract.address, iterator, { value: 3 });
     await storageContract.setAuctionAddress(auctionContract.address);
