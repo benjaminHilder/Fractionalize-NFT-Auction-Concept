@@ -51,6 +51,7 @@ function NavBarMain() {
 
                 <CustomLink to="/MintNFT">Mint NFT</CustomLink>
                 <CustomLink to="/FractionNFT">Fraction NFT</CustomLink>
+                <CustomLink to="/WithdrawNFT">Withdraw NFT</CustomLink>
             </ul>
         </nav>
         )
