@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useState } from 'react';
 
 let isWalletConncted;
+export let connectedAddress;
 
 function NavBarMain() {
     const [walletAddress, setWalletAddress] = useState("");
@@ -16,7 +17,9 @@ function NavBarMain() {
                     method: "eth_requestAccounts",
             });
             setWalletAddress(accounts[0]);
+            connectedAddress = accounts[0]
             isWalletConncted = Boolean(accounts[0]);
+            connectWallet = accounts[0];
             console.log("account: " + accounts[0])
 
         } catch (error) {
@@ -33,6 +36,7 @@ function NavBarMain() {
             await requestAccount();
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
+
         }
     }
 
@@ -66,7 +70,7 @@ function NavBarMain() {
             </li>
         )
 
-}
+    }
 
 }
 export default NavBarMain;

@@ -21,6 +21,10 @@ body {
     padding: 0 1rem;
 }
 
+.horizontalBlocks {
+    display: inline-block;
+  }
+
 .MintNft {
     background-color: red;
     color: orange;

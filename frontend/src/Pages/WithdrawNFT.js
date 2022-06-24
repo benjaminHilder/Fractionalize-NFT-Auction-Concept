@@ -16,17 +16,6 @@ const AuctionContractAddress = "0x80a59d42Ae2bB464721064895a58ca6857fF5CC4"
 const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
 
 function WithdrawNFT() {
-    const STATES = {
-        MENU: 0,
-        PROPOSALS: 1,
-        ACTIVE_AUCTIONS: 2,
-        CREATE_AUCTION: 3
-    }
-
-    const CurrentState = STATES.MENU
-
-
-
     return (
     <div>
         <Alert>Withdraw NFT</Alert>

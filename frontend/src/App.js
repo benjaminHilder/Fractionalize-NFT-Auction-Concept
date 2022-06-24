@@ -8,6 +8,10 @@ import Home from './Pages/Home';
 import Proposals from './Pages/Auction/Proposals';
 import CreateAuction from './Pages/Auction/CreateAuction';
 import ActiveAuction from './Pages/Auction/ActiveAuctions'
+import Fractionalise from './FractionNFT/Fractionalise';
+import ManualFractionalise from './FractionNFT/ManualFractionalise';
+import CreateFraction from './FractionNFT/CreateFraction';
+
 import { Route, Routes } from "react-router-dom";
 
 function App() {
@@ -23,6 +27,10 @@ function App() {
           <Route path="Proposals" element={<Proposals />} />
           <Route path="CreateAuction" element={<CreateAuction />} />
           <Route path="ActiveAuctions" element={<ActiveAuction />} />
+          <Route path="Fractionalise" element={<Fractionalise />} />
+          <Route path="ManualFractionalise" element={<ManualFractionalise />} />
+          <Route path="CreateFraction" element={<CreateFraction />} />
+
         </Routes>
       </div>
     </>
