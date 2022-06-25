@@ -12,10 +12,13 @@ import { useState } from 'react';
 
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
-const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
-const AuctionContractAddress = "0x80a59d42Ae2bB464721064895a58ca6857fF5CC4"
-const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
+//ropsten
+//const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
+//const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
 
+//rinkeby
+const StorageContractAddress = "0x340F1507C375E3fA3Ce256ae0f879cc1a346139F"
+const NFTGeneratorContractAddress = "0x245624eF9844B60C16d4C8c119F26aAF97301bf7";
 
 function ManualFractionalise() {
     const [nftContractAddress, setNftContractAddress] = useState("");

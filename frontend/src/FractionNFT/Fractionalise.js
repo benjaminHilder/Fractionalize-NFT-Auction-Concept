@@ -1,13 +1,14 @@
-import { React, useState } from "react"
+import { React, useState, useEffect } from "react"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../MainStyles.css'
 
 import { Button, Card } from 'react-bootstrap'
 import { ethers } from "ethers";
 import { Link, useMatch, useResolvedPath, useSearchParams } from "react-router-dom";
-import { connectedAddress } from "../Navbar.js"
+import { connectedAddress, isWalletConncted } from "../Navbar.js"
 
 export let selectedNft
+
 
 function Fractionalise() {
     const [data, setData] = useState([])
@@ -16,16 +17,17 @@ function Fractionalise() {
     const getData = () => {        
         const options = {method: 'GET', headers: {Accept: 'application/json'}};
         
-        fetch(`https://api.opensea.io/api/v1/assets?owner=${connectedAddress}&order_direction=desc&limit=20&include_orders=false`, 
+        fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${connectedAddress}&order_direction=desc&limit=20&include_orders=false`, 
         options
         )
           .then(response => response.json())
           .then(response => setData(response.assets))
           .catch(err => console.error(err));
+
     }
 
         
-    const renderButton = (nft, index) => {
+    const renderNfts = (nft, index) => {
         return(<Button key={index}
         onClick={() => selectedNft = nft}>
             <CustomLink to="/CreateFraction">
@@ -36,14 +38,22 @@ function Fractionalise() {
         </Button>)
     }
 
+  //function renderAllNfts() {
+  //    if (isWalletConncted) {
+  //        getData();
+  //        data.map(renderNfts)
+  //    }
+  //}
+  //{ useEffect(() => renderAllNfts)}
     return(
         <nav>
             <div>
             <CustomLink to="/FractionNFT">Back</CustomLink>
-            <Button onClick={getData}>Get NFTs</Button>
+            <Button onClick={getData}>Get Nfts</Button>
             </div>
+            
+            {data.map(renderNfts)}
 
-        {data.map(renderButton)}
         </nav>
     )
 

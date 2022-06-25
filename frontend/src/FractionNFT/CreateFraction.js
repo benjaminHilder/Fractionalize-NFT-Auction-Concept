@@ -1,19 +1,20 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-
+import { selectedNft } from "./Fractionalise";
 import { Button, Card, Form } from 'react-bootstrap'
 import { ethers, BigNumber } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
+import axios from "axios";
 import Storage from "../Json/Storage.json";
 import NFTGenerator from "../Json/NFTGenerator.json"
 
 
+//ropsten
+//const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
 
-import { selectedNft } from "./Fractionalise";
-
-const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
-const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
+//rinkeby
+const StorageContractAddress = "0x340F1507C375E3fA3Ce256ae0f879cc1a346139F"
 
 function CreateFraction() {
     const [fractionTokenName, setFractionTokenName] = useState("")
@@ -21,26 +22,44 @@ function CreateFraction() {
     const [tokenSupply, setTokenSupply] = useState("")
     const [tokenRoyalty, setTokenRoyalty] = useState("")
 
+    const [nftAbi, setNftAbi] = useState("");
+
     const handleFractionTokenNameChange = (event) => setFractionTokenName(event.target.value);
     const handleFractionTokenTickerChange = (event) => setFractionTokenTicker(event.target.value);
     const handleTokenSupplyChange = (event) => setTokenSupply(event.target.value);
     const handleTokenRoyaltyChange = (event) => setTokenRoyalty(event.target.value);
+
+    const etherScanApi = `https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${selectedNft.asset_contract.address}&apikey=QF41CVNJWPQBFG2WKQPSCW345TYU5WMTKY`
+
+    const getAbi = async () => {
+        let res = await axios.get(etherScanApi)
+        setNftAbi(JSON.parse(res.data.result))
+    }
+
+    async function getInfo() {
+        console.log("contract address: " + JSON.stringify(selectedNft.asset_contract.address))
+        console.log("token id: " + JSON.stringify(selectedNft.token_id))
+        
+    }
     
     async function handleApproveNftContract() {
         if(window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(
-                NFTGeneratorContractAddress,
-                NFTGenerator.abi,
-                signer
-            );
-            try {
-                const response = await contract.approve(StorageContractAddress, selectedNft.token_id);
-                console.log('response: ', response);
-            } catch (err) {
-                console.log("error", err);
-            }
+        getAbi()
+         const provider = new ethers.providers.Web3Provider(window.ethereum);
+         const signer = provider.getSigner();
+
+        const contract = new ethers.Contract(
+            selectedNft.asset_contract.address,
+            nftAbi,
+            signer
+        )
+        try {
+            const response = await contract.approve(StorageContractAddress, selectedNft.token_id);
+            console.log('response: ' + response);
+        } catch (err) {
+            console.log("error", err)
+        }
+
         }
     }
 
@@ -48,14 +67,14 @@ function CreateFraction() {
         if(window.ethereum) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
+
             const contract = new ethers.Contract(
                 StorageContractAddress,
                 Storage.abi,
                 signer
             );
             try {
-                const response = await contract.depositNft(selectedNft.asset_contract_address, selectedNft.token_id);
-
+                const response = await contract.depositNft(selectedNft.asset_contract.address, selectedNft.token_id);
                 console.log('response: ', response);
             } catch (err) {
                 console.log("error", err);
@@ -74,11 +93,12 @@ function CreateFraction() {
             );
 
             try {
-                const response = await contract.createFraction(selectedNft.asset_contract_address,
+                let supplyString = BigNumber.from(tokenSupply).toString() + "000000000000000000";
+                const response = await contract.createFraction(selectedNft.asset_contract.address,
                                                                BigNumber.from(selectedNft.token_id),
                                                                fractionTokenName.toString(),
                                                                fractionTokenTicker.toString(),
-                                                               BigNumber.from(tokenSupply),
+                                                               /*BigInt(supplyString*/ BigNumber.from(tokenSupply),
                                                                BigNumber.from(tokenRoyalty));
                 console.log('response: ', response);
             } catch (err) {
@@ -112,6 +132,10 @@ function CreateFraction() {
                             placeholder="Enter Fraction Token Royalty"
                             onChange={handleTokenRoyaltyChange}/>
                 </Form.Group>
+
+                <Button onClick={getInfo}>
+                get info
+                </Button>
 
                 <Button
                 onClick={handleApproveNftContract}>Approve Contract</Button>

@@ -3,7 +3,7 @@ import { Button } from "react-bootstrap";
 import { ethers } from "ethers";
 import { useState } from 'react';
 
-let isWalletConncted;
+export let isWalletConncted;
 export let connectedAddress;
 
 function NavBarMain() {
