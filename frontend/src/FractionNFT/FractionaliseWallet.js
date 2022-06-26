@@ -9,10 +9,8 @@ import { connectedAddress, isWalletConncted } from "../Navbar.js"
 
 export let selectedNft
 
-
-function Fractionalise() {
+function FractionaliseWallet() {
     const [data, setData] = useState([])
-
 
     const getData = () => {        
         const options = {method: 'GET', headers: {Accept: 'application/json'}};
@@ -23,7 +21,6 @@ function Fractionalise() {
           .then(response => response.json())
           .then(response => setData(response.assets))
           .catch(err => console.error(err));
-
     }
 
         
@@ -38,13 +35,6 @@ function Fractionalise() {
         </Button>)
     }
 
-  //function renderAllNfts() {
-  //    if (isWalletConncted) {
-  //        getData();
-  //        data.map(renderNfts)
-  //    }
-  //}
-  //{ useEffect(() => renderAllNfts)}
     return(
         <nav>
             <div>
@@ -69,4 +59,4 @@ function Fractionalise() {
     }
 }
 
-export default Fractionalise;
+export default FractionaliseWallet;

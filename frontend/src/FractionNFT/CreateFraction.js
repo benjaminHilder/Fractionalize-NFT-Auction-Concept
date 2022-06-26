@@ -1,6 +1,6 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-import { selectedNft } from "./Fractionalise";
+import { selectedNft } from "./FractionaliseWallet";
 import { Button, Card, Form } from 'react-bootstrap'
 import { ethers, BigNumber } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
@@ -14,7 +14,7 @@ import NFTGenerator from "../Json/NFTGenerator.json"
 //const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
 
 //rinkeby
-const StorageContractAddress = "0x340F1507C375E3fA3Ce256ae0f879cc1a346139F"
+const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
 
 function CreateFraction() {
     const [fractionTokenName, setFractionTokenName] = useState("")
@@ -39,7 +39,6 @@ function CreateFraction() {
     async function getInfo() {
         console.log("contract address: " + JSON.stringify(selectedNft.asset_contract.address))
         console.log("token id: " + JSON.stringify(selectedNft.token_id))
-        
     }
     
     async function handleApproveNftContract() {
@@ -77,7 +76,7 @@ function CreateFraction() {
                 const response = await contract.depositNft(selectedNft.asset_contract.address, selectedNft.token_id);
                 console.log('response: ', response);
             } catch (err) {
-                console.log("error", err);
+                console.log("error: ", err);
             }
         }
     }
@@ -109,7 +108,7 @@ function CreateFraction() {
     
     return(
         <nav>
-            <CustomLink to="/Fractionalise">Back</CustomLink>
+            <CustomLink to="/FractionaliseWallet">Back</CustomLink>
 
             <img src={selectedNft.image_url} />
             <p>{selectedNft.name}</p>

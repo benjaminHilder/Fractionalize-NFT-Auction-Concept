@@ -5,7 +5,7 @@ import { Button, Card } from 'react-bootstrap'
 import { ethers } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
-function ActiveAuction() {
+function ActiveAuctions() {
 
     return(
         <nav>
@@ -25,4 +25,4 @@ function ActiveAuction() {
     }
 }
 
-export default ActiveAuction;
+export default ActiveAuctions;

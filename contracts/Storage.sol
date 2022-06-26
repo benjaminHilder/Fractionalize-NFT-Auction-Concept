@@ -14,6 +14,17 @@ contract Storage is IERC721Receiver {
     mapping(baseFractionToken => address) nftAddressFromFraction;
     mapping(baseFractionToken => uint) nftIdFromFraction;
 
+    struct DepositedNftInfo {
+        address nftAddress;
+        uint256 nftId;
+    }
+
+    mapping(address => nftDepositFolder) depositFolder;
+
+    struct nftDepositFolder {
+        DepositedNftInfo[] deposits;
+    }
+
     address contractDeployer;
     address auctionAddress;
 
@@ -57,6 +68,11 @@ contract Storage is IERC721Receiver {
     
         isNftDeposited[_nftAddress][_nftId] = true;
         nftOwner[_nftAddress][_nftId] = msg.sender;
+
+        DepositedNftInfo memory newDeposit;
+        newDeposit.nftAddress = _nftAddress;
+        newDeposit.nftId = _nftId;
+        depositFolder[msg.sender].deposits.push(newDeposit);
     }
 
     function createFraction(
@@ -97,6 +113,15 @@ contract Storage is IERC721Receiver {
         require(nftOwner[_nftAddress][_nftId] == msg.sender, "This address does not own this NFT");
 
         nftOwner[_nftAddress][_nftId] = 0x0000000000000000000000000000000000000000;
+
+        for (uint i = 0; i < depositFolder[msg.sender].deposits.length; i++) {
+            if (depositFolder[msg.sender].deposits[i].nftAddress == _nftAddress &&
+                depositFolder[msg.sender].deposits[i].nftId == _nftId) {
+                delete depositFolder[msg.sender].deposits[i];
+                break;
+            }
+        }
+
         nft.safeTransferFrom(address(this), msg.sender, _nftId);
     }
     
@@ -150,6 +175,10 @@ contract Storage is IERC721Receiver {
     function setIsNftChangingOwnerTrue(address _nftAddress, uint _nftId) public {
         require(msg.sender == auctionAddress, "You are not the owner of this NFT");
         isNftChangingOwner[_nftAddress][_nftId] = true;
+    }
+
+    function getAddressDepositedNfts(address _address) public view returns(DepositedNftInfo[] memory) {
+        return (depositFolder[_address].deposits);
     }
 
     function onERC721Received(

@@ -95,20 +95,12 @@ contract Auction {
         uint256 _stakeAmount
     ) public {
         require(storageContract.getNftOwner(_nftAddress, _nftId) == msg.sender);
-        require(
-            storageContract.getIsNftFractionalised(_nftAddress, _nftId) == true,
-            "This NFT is not fractionalise"
-        );
+        require(storageContract.getIsNftFractionalised(_nftAddress, _nftId) == true,"This NFT is not fractionalise");
 
-        address FractionTokenAddress = storageContract
-            .getFractionAddressFromNft(_nftAddress, _nftId);
-        baseFractionToken FractionToken = baseFractionToken(
-            FractionTokenAddress
-        );
-        require(
-            _stakeAmount <= tokenBalances[FractionTokenAddress][msg.sender],
-            "You do not have enough tokens staked"
-        );
+        address FractionTokenAddress = storageContract.getFractionAddressFromNft(_nftAddress, _nftId);
+        baseFractionToken FractionToken = baseFractionToken(FractionTokenAddress);
+
+        require(_stakeAmount <= tokenBalances[FractionTokenAddress][msg.sender],"You do not have enough tokens staked");
 
         isNftInProposal[_nftAddress][_nftId] = true;
         proposalInitiator[_nftAddress][_nftId] = msg.sender;
@@ -138,14 +130,8 @@ contract Auction {
             FractionTokenAddress
         );
 
-        require(
-            isNftInProposal[_nftAddress][_nftId] == true,
-            "There is no proposal active for this NFT"
-        );
-        require(
-            _voteAmount <= tokenBalances[FractionTokenAddress][msg.sender],
-            "You don't have enough tokens staked"
-        );
+        require(isNftInProposal[_nftAddress][_nftId] == true,"There is no proposal active for this NFT");
+        require(_voteAmount <= tokenBalances[FractionTokenAddress][msg.sender],"You don't have enough tokens staked");
 
         if (block.timestamp < proposalFinishTime[_nftAddress][_nftId]) {
             totalVoted[_nftAddress][_nftId] += _voteAmount;
@@ -295,90 +281,51 @@ contract Auction {
         return block.timestamp;
     }
 
-    function isAuctionActive(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (bool)
-    {
+    function isAuctionActive(address _nftAddress, uint256 _nftId) public view returns (bool) {
         return isNftInAuction[_nftAddress][_nftId];
     }
 
-    function getAddressTokenBalance(
-        address _fractionTokenAddress,
-        address _user
-    ) public view returns (uint256) {
+    function getAddressTokenBalance(address _fractionTokenAddress, address _user) public view returns (uint256) {
         return tokenBalances[_fractionTokenAddress][_user];
     }
 
-    function getIsNftInProposal(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (bool)
-    {
+    function getIsNftInProposal(address _nftAddress, uint256 _nftId) public view returns (bool) {
         return isNftInProposal[_nftAddress][_nftId];
     }
 
-    function getProposalStartPrice(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (uint256)
-    {
+    function getProposalStartPrice(address _nftAddress, uint256 _nftId) public view returns (uint256) {
         return nftProposalStartPrice[_nftAddress][_nftId];
     }
 
-    function getProposalInitiator(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (address)
-    {
+    function getProposalInitiator(address _nftAddress, uint256 _nftId) public view returns (address) {
         return proposalInitiator[_nftAddress][_nftId];
     }
 
-    function getProposalFinishTime(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (uint256)
-    {
+    function getProposalFinishTime(address _nftAddress, uint256 _nftId) public view returns (uint256) {
         return proposalFinishTime[_nftAddress][_nftId];
     }
 
-    function getProposalTotalVoted(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (uint256)
-    {
+    function getProposalTotalVoted(address _nftAddress, uint256 _nftId) public view returns (uint256) {
         return totalVoted[_nftAddress][_nftId];
     }
 
-    function getProposalScore(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (uint256)
-    {
+    function getProposalScore(address _nftAddress, uint256 _nftId) public view returns (uint256) {
         return score[_nftAddress][_nftId];
     }
 
-    function getAuctionCurrentLeader(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (address)
-    {
+    function getAuctionCurrentLeader(address _nftAddress, uint256 _nftId) public view returns (address) {
         return auctionCurrentLeader[_nftAddress][_nftId];
     }
 
-    function getAuctionCurrentBid(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (uint256)
-    {
+    function getAuctionCurrentBid(address _nftAddress, uint256 _nftId) public view returns (uint256) {
         return auctionCurrentBid[_nftAddress][_nftId];
     }
 
-    function getIfNftIsInAuction(address _nftAddress, uint256 _nftId)
-        public
-        view
-        returns (bool)
-    {
+    function getIfNftIsInAuction(address _nftAddress, uint256 _nftId)public view returns (bool) {
         return isNftInAuction[_nftAddress][_nftId];
+    }
+
+    function getTotalStaked(address _fractionAddress, address _user) public view returns (uint256) {
+        return tokenBalances[_fractionAddress][_user];
     }
 }

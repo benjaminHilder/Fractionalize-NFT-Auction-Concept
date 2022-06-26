@@ -20,21 +20,23 @@ function WithdrawNFT() {
     <div>
         <Alert>Withdraw NFT</Alert>
 
-        <CustomLink to="/Proposals">
-        <Button>Proposals</Button>
+        <CustomLink to="/ProposalWallet">
+        <Button>Create Proposal</Button>
         </CustomLink>
 
-        <CustomLink to="/CreateAuction">
-        <Button>Create Auction</Button>
+        <CustomLink to="/ActiveProposals">
+        <Button>Active Proposals</Button>
         </CustomLink>
 
         <CustomLink to="/ActiveAuctions">
         <Button>Active Auctions</Button>
         </CustomLink>
 
-    </div>
+        <CustomLink to ="/Withdraw">
+            <Button>Withdraw</Button>
+        </CustomLink>
 
-    
+    </div>
     )
 
     function CustomLink({ to, children, ...props }) {

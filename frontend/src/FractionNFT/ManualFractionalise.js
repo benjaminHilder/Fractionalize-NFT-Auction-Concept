@@ -10,6 +10,8 @@ import Auction from "../Json/Auction.json";
 import NFTGenerator from "../Json/NFTGenerator.json"
 import { useState } from 'react';
 
+import axios from "axios";
+
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 //ropsten
@@ -17,8 +19,7 @@ import { Link, useMatch, useResolvedPath } from "react-router-dom";
 //const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
 
 //rinkeby
-const StorageContractAddress = "0x340F1507C375E3fA3Ce256ae0f879cc1a346139F"
-const NFTGeneratorContractAddress = "0x245624eF9844B60C16d4C8c119F26aAF97301bf7";
+const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
 
 function ManualFractionalise() {
     const [nftContractAddress, setNftContractAddress] = useState("");
@@ -28,6 +29,8 @@ function ManualFractionalise() {
     const [tokenSupply, setTokenSupply] = useState("")
     const [tokenRoyalty, setTokenRoyalty] = useState("")
 
+    const [nftAbi, setNftAbi] = useState("");
+
     const handleNftContractAddressChange = (event) => setNftContractAddress(event.target.value);
     const handleNftIdChange = (event) => setNftId(event.target.value);
     const handleFractionTokenNameChange = (event) => setFractionTokenName(event.target.value);
@@ -35,13 +38,21 @@ function ManualFractionalise() {
     const handleTokenSupplyChange = (event) => setTokenSupply(event.target.value);
     const handleTokenRoyaltyChange = (event) => setTokenRoyalty(event.target.value);
 
+    const etherScanApi = `https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${nftContractAddress}&apikey=QF41CVNJWPQBFG2WKQPSCW345TYU5WMTKY`
+
+    const getAbi = async () => {
+        let res = await axios.get(etherScanApi)
+        setNftAbi(JSON.parse(res.data.result))
+    }
+
     async function handleApproveNftContract() {
         if(window.ethereum) {
+            getAbi()
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const contract = new ethers.Contract(
-                NFTGeneratorContractAddress,
-                NFTGenerator.abi,
+                nftContractAddress,
+                nftAbi,
                 signer
             );
             try {

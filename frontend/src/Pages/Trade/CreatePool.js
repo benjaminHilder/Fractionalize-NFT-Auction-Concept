@@ -1,15 +1,17 @@
 import React from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-
-import { Button, Card } from 'react-bootstrap'
+import { Button, Card, Form } from 'react-bootstrap'
 import { ethers } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
-function CreateAuction() {
+function CreatePool() {
 
     return(
         <nav>
-            <CustomLink to="/WithdrawNFT">Back</CustomLink>
+            <CustomLink to="/Trade">Back</CustomLink>
+            <Form>
+                
+            </Form>
         </nav>
     )
 
@@ -25,4 +27,4 @@ function CreateAuction() {
     }
 }
 
-export default CreateAuction;
+export default CreatePool;
