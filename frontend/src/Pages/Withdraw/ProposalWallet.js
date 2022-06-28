@@ -1,10 +1,10 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-
-import { Button, Card } from 'react-bootstrap'
+import { Button} from 'react-bootstrap'
 import { ethers } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
-import { connectedAddress, isWalletConncted } from "../../Navbar.js"
+
+import { RinkebyStorageAddress } from '../../App';
 
 export let selectedNft
 
@@ -18,7 +18,7 @@ function ProposalWallet() {
     const getData = () => { 
         const options = {method: 'GET', headers: {Accept: 'application/json'}};
         
-        fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${StorageContractAddress}&order_direction=desc&limit=20&include_orders=false`, 
+        fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${RinkebyStorageAddress}&order_direction=desc&limit=20&include_orders=false`, 
         options
         )
           .then(response => response.json())
@@ -32,15 +32,15 @@ function ProposalWallet() {
             const signer = provider.getSigner();
 
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );
             try {
                 let deposits = [];
             for (let i = 0; i < data.length; i++) {
-                for (let j = 0; j < contract.getAddressDepositedNfts(signer[0]).length; i++) {
-                    if (data[i] == contract.getAddressDepositedNfts(signer[0])[j]) {
+                for (let j = 0; j < contract.getAddressDepositedNfts(signer.getAddress()).length; i++) {
+                    if (data[i] == contract.getAddressDepositedNfts(signer.getAddress())[j]) {
                         deposits.push(data[i]);
                     }
                 }

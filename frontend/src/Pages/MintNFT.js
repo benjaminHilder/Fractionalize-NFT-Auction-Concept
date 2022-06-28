@@ -4,25 +4,20 @@ import mainStyle from '../MainStyles.css';
 import { Button, Card } from 'react-bootstrap'
 import { ethers } from "ethers";
 
-import NFTGenerator from "../Json/NFTGenerator.json"
-
-//ropsten
-//const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
-
-//rinkeby
-const NFTGeneratorContractAddress = "0x245624eF9844B60C16d4C8c119F26aAF97301bf7"
+import NFT from "../Json/NFT.json"
+import { RinkebyNftAddress } from '../App';
 
 async function handleAutoMintNext() {
     if(window.ethereum) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(
-            NFTGeneratorContractAddress,
-            NFTGenerator.abi,
+            RinkebyNftAddress,
+            NFT.abi,
             signer
         );
         try {
-            const response = await contract.safeMintNextId();
+            const response = await contract.mint(signer.getAddress(), 1);
         } catch (err) {
             console.log("error", err);
         }

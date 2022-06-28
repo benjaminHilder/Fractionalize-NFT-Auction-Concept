@@ -1,25 +1,13 @@
-import React from 'react';
+import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-import mainStyle from '../MainStyles.css';
 import { Button, Alert, Form} from 'react-bootstrap'
 import { ethers, BigNumber } from 'ethers';
-
-import baseFractionToken from "../Json/baseFractionToken.json";
-import Storage from "../Json/Storage.json";
-import Auction from "../Json/Auction.json";
-import NFTGenerator from "../Json/NFTGenerator.json"
-import { useState } from 'react';
-
-import axios from "axios";
-
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
-//ropsten
-//const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
-//const NFTGeneratorContractAddress = "0x2444fa34EA2537f927fa9fB9586fbd4A46972785";
+import Storage from "../Json/Storage.json";
+import axios from "axios";
 
-//rinkeby
-const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
+import { RinkebyStorageAddress } from '../App';
 
 function ManualFractionalise() {
     const [nftContractAddress, setNftContractAddress] = useState("");
@@ -56,7 +44,7 @@ function ManualFractionalise() {
                 signer
             );
             try {
-                const response = await contract.approve(StorageContractAddress, nftId);
+                const response = await contract.approve(RinkebyStorageAddress, nftId);
                 console.log('response: ', response);
             } catch (err) {
                 console.log("error", err);
@@ -69,7 +57,7 @@ function ManualFractionalise() {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );
@@ -88,7 +76,7 @@ function ManualFractionalise() {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );

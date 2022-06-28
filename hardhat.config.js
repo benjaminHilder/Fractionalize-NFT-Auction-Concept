@@ -25,7 +25,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.14",
+  solidity: "0.8.13",
   networks: {
     ropsten: {
       url: SECRETS.INFURA_ROPSTEN_URL,
@@ -40,6 +40,8 @@ module.exports = {
   },
 
   etherscan: {
-    apiKey: SECRETS.ETHERSCAN_KEY
+    apiKey: {
+      rinkeby: "QF41CVNJWPQBFG2WKQPSCW345TYU5WMTKY"
+    }
   }
 };

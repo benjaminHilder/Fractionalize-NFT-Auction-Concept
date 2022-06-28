@@ -27,14 +27,14 @@ async function main() {
   const auction = await Auction.deploy(storage.address);
   await auction.deployed();
 
-  const NftGenerator = await hre.ethers.getContractFactory("NFTGenerator");
-  const nftGenerator = await NftGenerator.deploy();
-  await nftGenerator.deployed();
+  const Nft = await hre.ethers.getContractFactory("NFT");
+  const nft = await Nft.deploy("Fractionalise Sample NFT", "FSNFT", "ipfs://QmaqgBZVuhQwkhrLs3WB9P9Aq5xReYN4h73mAmQzhSnncB/");
+  await nft.deployed();
 
   //console.log("Greeter deployed to:", greeter.address);
   console.log("Storage address: " + storage.address);
   console.log("Auction address: " + auction.address);
-  console.log("NFTGenerator address: " + nftGenerator.address);
+  console.log("NFT address: " + nft.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

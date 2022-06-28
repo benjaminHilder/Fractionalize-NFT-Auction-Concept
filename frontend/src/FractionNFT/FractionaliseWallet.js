@@ -1,11 +1,9 @@
-import { React, useState, useEffect } from "react"
+import { React, useState} from "react"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../MainStyles.css'
-
-import { Button, Card } from 'react-bootstrap'
-import { ethers } from "ethers";
-import { Link, useMatch, useResolvedPath, useSearchParams } from "react-router-dom";
-import { connectedAddress, isWalletConncted } from "../Navbar.js"
+import { Button} from 'react-bootstrap'
+import { Link, useMatch, useResolvedPath} from "react-router-dom";
+import { connectedAddress } from "../Navbar.js"
 
 export let selectedNft
 

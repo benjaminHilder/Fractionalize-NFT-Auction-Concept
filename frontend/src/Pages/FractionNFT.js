@@ -1,15 +1,6 @@
 import React from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-import mainStyle from '../MainStyles.css';
-import { Button, Alert, Form} from 'react-bootstrap'
-import { ethers, BigNumber } from 'ethers';
-
-import baseFractionToken from "../Json/baseFractionToken.json";
-import Storage from "../Json/Storage.json";
-import Auction from "../Json/Auction.json";
-import NFTGenerator from "../Json/NFTGenerator.json"
-import { useState } from 'react';
-
+import { Button, Alert} from 'react-bootstrap'
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 function FractionNFT() {

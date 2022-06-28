@@ -1,20 +1,12 @@
 import { React, useState } from 'react';
-//import 'bootstrap/dist/css/bootstrap.min.css'
 import { selectedNft } from "./FractionaliseWallet";
-import { Button, Card, Form } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { ethers, BigNumber } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
-
 import axios from "axios";
 import Storage from "../Json/Storage.json";
-import NFTGenerator from "../Json/NFTGenerator.json"
 
-
-//ropsten
-//const StorageContractAddress = "0xAE51a1487Ee7864D0200D9D22922C6741c7728f7"
-
-//rinkeby
-const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
+import { RinkebyStorageAddress } from '../App';
 
 function CreateFraction() {
     const [fractionTokenName, setFractionTokenName] = useState("")
@@ -53,7 +45,7 @@ function CreateFraction() {
             signer
         )
         try {
-            const response = await contract.approve(StorageContractAddress, selectedNft.token_id);
+            const response = await contract.approve(RinkebyStorageAddress, selectedNft.token_id);
             console.log('response: ' + response);
         } catch (err) {
             console.log("error", err)
@@ -68,7 +60,7 @@ function CreateFraction() {
             const signer = provider.getSigner();
 
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );
@@ -86,7 +78,7 @@ function CreateFraction() {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );

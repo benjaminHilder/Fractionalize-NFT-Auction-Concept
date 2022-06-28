@@ -1,12 +1,13 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
 
-import { Button, Card, Form } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { ethers } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import { selectedNft } from "./ProposalWallet"
 import Auction from "../../Json/Auction.json";
-const AuctionContract = "0x336c1f0c9602726951b8B335bFF6F458b1BBE876"
+
+import { RinkebyAuctionAddress } from '../../App';
 
 //const etherScanApi = `https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${selectedNft.asset_contract.address}&apikey=QF41CVNJWPQBFG2WKQPSCW345TYU5WMTKY`
 function CreateProposal() {
@@ -25,12 +26,12 @@ function CreateProposal() {
             const signer = provider.getSigner();
 
             const contract = new ethers.Contract(
-                AuctionContract,
+                RinkebyAuctionAddress,
                 Auction.abi,
                 signer
             )
             try {
-                const response = await contract.getTotalStaked(selectedNft.asset_contract.address, signer[0])
+                const response = await contract.getTotalStaked(selectedNft.asset_contract.address, signer.getAddress())
                 setStakedBalance(response)
                 console.log("response: " + response)
             } catch (err) {
@@ -45,7 +46,7 @@ function CreateProposal() {
             const signer = provider.getSigner();
 
             const contract = new ethers.Contract(
-                AuctionContract,
+                RinkebyAuctionAddress,
                 Auction.abi,
                 signer
             )

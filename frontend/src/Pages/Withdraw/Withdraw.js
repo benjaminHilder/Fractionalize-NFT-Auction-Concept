@@ -1,13 +1,11 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
-
-import { Button, Card, Form } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { ethers } from "ethers";
-import { Link, useMatch, useResolvedPath, useSearchParams } from "react-router-dom";
+import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 import Storage from "../../Json/Storage.json";
-//rinkeby
-const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
+import { RinkebyStorageAddress } from '../../App';
 
 function Withdraw() {
     const [nftContractAddress, setNftContractAddress] = useState()
@@ -22,7 +20,7 @@ function Withdraw() {
             const signer = provider.getSigner();
 
             const contract = new ethers.Contract(
-                StorageContractAddress,
+                RinkebyStorageAddress,
                 Storage.abi,
                 signer
             )
