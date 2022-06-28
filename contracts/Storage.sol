@@ -14,15 +14,11 @@ contract Storage is IERC721Receiver {
     mapping(baseFractionToken => address) nftAddressFromFraction;
     mapping(baseFractionToken => uint) nftIdFromFraction;
 
-    struct DepositedNftInfo {
-        address nftAddress;
-        uint256 nftId;
-    }
-
     mapping(address => nftDepositFolder) depositFolder;
 
     struct nftDepositFolder {
-        DepositedNftInfo[] deposits;
+        address[] nftAddresses;
+        uint[] nftIds;
     }
 
     address contractDeployer;
@@ -69,10 +65,8 @@ contract Storage is IERC721Receiver {
         isNftDeposited[_nftAddress][_nftId] = true;
         nftOwner[_nftAddress][_nftId] = msg.sender;
 
-        DepositedNftInfo memory newDeposit;
-        newDeposit.nftAddress = _nftAddress;
-        newDeposit.nftId = _nftId;
-        depositFolder[msg.sender].deposits.push(newDeposit);
+        depositFolder[msg.sender].nftAddresses.push(_nftAddress);
+        depositFolder[msg.sender].nftIds.push(_nftId);
     }
 
     function createFraction(
@@ -114,10 +108,12 @@ contract Storage is IERC721Receiver {
 
         nftOwner[_nftAddress][_nftId] = 0x0000000000000000000000000000000000000000;
 
-        for (uint i = 0; i < depositFolder[msg.sender].deposits.length; i++) {
-            if (depositFolder[msg.sender].deposits[i].nftAddress == _nftAddress &&
-                depositFolder[msg.sender].deposits[i].nftId == _nftId) {
-                delete depositFolder[msg.sender].deposits[i];
+        for (uint i = 0; i < depositFolder[msg.sender].nftAddresses.length; i++) {
+            if (depositFolder[msg.sender].nftAddresses[i] == _nftAddress &&
+                depositFolder[msg.sender].nftIds[i] == _nftId) {
+                
+                delete depositFolder[msg.sender].nftAddresses[i];
+                delete depositFolder[msg.sender].nftIds[i];
                 break;
             }
         }
@@ -177,8 +173,12 @@ contract Storage is IERC721Receiver {
         isNftChangingOwner[_nftAddress][_nftId] = true;
     }
 
-    function getAddressDepositedNfts(address _address) public view returns(DepositedNftInfo[] memory) {
-        return (depositFolder[_address].deposits);
+    function getUserDepositedNftAddress(address _address) public view returns (address[] memory) {
+        return (depositFolder[_address].nftAddresses);
+    }
+
+    function getUserDepositedNftIds(address _address) public view returns (uint[] memory) {
+        return (depositFolder[_address].nftIds);
     }
 
     function onERC721Received(

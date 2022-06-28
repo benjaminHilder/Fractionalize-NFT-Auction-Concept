@@ -18,9 +18,9 @@ import CreatePool from './Pages/Trade/CreatePool';
 
 import { Route, Routes } from "react-router-dom";
 
-export const RinkebyStorageAddress = "0x1FBC91754117e8C35310f23b7481f3608F5ED685"
-export const RinkebyAuctionAddress = "0x7Db2fb0fBdc5A2D9BD1bb2C3341D1f67C3cA91bD"
-export const RinkebyNftAddress = "0x5C27f26830185b9BaB921d90Bc81288b3a778026"
+export const RinkebyStorageAddress = "0x7afd24cf6A16d55A3fcB36Cff5647B6B631781a6"
+export const RinkebyAuctionAddress = "0x324addF7A8AE7d0B61296f0943D90430722363bc"
+export const RinkebyNftAddress = "0x525616772d59a4A46Bd1Cda9643740Ca9E9B2E65"
 
 function App() {
   return (

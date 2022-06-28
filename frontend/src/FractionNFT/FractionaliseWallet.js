@@ -39,7 +39,6 @@ function FractionaliseWallet() {
             <CustomLink to="/FractionNFT">Back</CustomLink>
             <Button onClick={getData}>Get Nfts</Button>
             </div>
-            
             {data.map(renderNfts)}
 
         </nav>

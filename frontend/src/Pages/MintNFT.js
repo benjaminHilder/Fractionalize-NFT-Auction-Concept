@@ -4,8 +4,8 @@ import mainStyle from '../MainStyles.css';
 import { Button, Card } from 'react-bootstrap'
 import { ethers } from "ethers";
 
-import NFT from "../Json/NFT.json"
 import { RinkebyNftAddress } from '../App';
+import NFT from "../Json/NFT.json"
 
 async function handleAutoMintNext() {
     if(window.ethereum) {

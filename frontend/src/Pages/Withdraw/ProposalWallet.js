@@ -1,20 +1,18 @@
 import { React, useState } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button} from 'react-bootstrap'
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 import { RinkebyStorageAddress } from '../../App';
+import Storage from '../../Json/Storage.json'
 
 export let selectedNft
 
-//rinkeby
-const StorageContractAddress = "0x74066c2Dc145CB8B07eADDDFFc740f43a52983F1"
-
 function ProposalWallet() {
     const [data, setData] = useState([])
-    const [depositedNfts, setDepositedNfts] = useState([])
-
+    const [userNfts, setUserNfts] = useState([]);
+    
     const getData = () => { 
         const options = {method: 'GET', headers: {Accept: 'application/json'}};
         
@@ -24,30 +22,41 @@ function ProposalWallet() {
           .then(response => response.json())
           .then(response => setData(response.assets))
           .catch(err => console.error(err));
+
+        setUserDepositedNfts()
     }
 
-    function setUserDepositedNfts() {
+    async function setUserDepositedNfts() {
         if(window.ethereum) {
+
+            let userNfts = [];
+
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-
             const contract = new ethers.Contract(
                 RinkebyStorageAddress,
                 Storage.abi,
                 signer
             );
             try {
-                let deposits = [];
+
+                let addressDeposits = await contract.getUserDepositedNftAddress(signer.getAddress());
+                let idDeposits = await contract.getUserDepositedNftIds(signer.getAddress());
+
+            //if a user deposited nft is in the storage contract
             for (let i = 0; i < data.length; i++) {
-                for (let j = 0; j < contract.getAddressDepositedNfts(signer.getAddress()).length; i++) {
-                    if (data[i] == contract.getAddressDepositedNfts(signer.getAddress())[j]) {
-                        deposits.push(data[i]);
+                for (let j = 0; j < addressDeposits.length; j++ ) {
+                    if (BigNumber.from(data[i].asset_contract.address).eq(BigNumber.from(addressDeposits[j])) &&
+                        data[i].token_id == idDeposits[j]) {
+
+                        userNfts.push(data[i])
                     }
                 }
             }
-            setDepositedNfts(deposits);
-            } catch (err) {
+            setUserNfts(userNfts);
 
+            } catch (err) {
+                console.log("error: " + err)
             }
         } 
     }
@@ -69,8 +78,9 @@ function ProposalWallet() {
             <CustomLink to="/WithdrawNFT">Back</CustomLink>
             <Button onClick={getData}>Get Nfts</Button>
             </div>
-            
-            {data.map(renderNfts)}
+            {console.log(userNfts)}
+
+            {userNfts.map(renderNfts)}
         </nav>
     )
 
