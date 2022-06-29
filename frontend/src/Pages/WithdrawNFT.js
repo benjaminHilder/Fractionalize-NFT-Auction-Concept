@@ -24,6 +24,10 @@ function WithdrawNFT() {
             <Button>Withdraw</Button>
         </CustomLink>
 
+        <CustomLink to ="/StakeWallet">
+            <Button>Stake</Button>
+        </CustomLink>
+
     </div>
     )
 

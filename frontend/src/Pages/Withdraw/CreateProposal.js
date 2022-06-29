@@ -51,7 +51,11 @@ function CreateProposal() {
                 signer
             )
             try {
-                const response = await contract.startProposal(selectedNft.asset_contract.address, selectedNft.token_id);
+                const response = await contract.startProposal(selectedNft.asset_contract.address, 
+                                                              selectedNft.token_id,
+                                                              startingPrice,
+                                                              time,
+                                                              stakeAmount);
                 console.log("response: " + response);
             } catch (err) {
                 console.log("error: " + err)

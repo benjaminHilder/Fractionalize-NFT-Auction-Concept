@@ -19,17 +19,23 @@ function FractionaliseWallet() {
           .then(response => response.json())
           .then(response => setData(response.assets))
           .catch(err => console.error(err));
+
+          console.log(data)
+    }
+
+    async function setNft(nft) {
+        console.log("log: " + nft.asset_contract.address)
     }
 
         
     const renderNfts = (nft, index) => {
         return(<Button key={index}
-        onClick={() => selectedNft = nft}>
+        onClick={/*() => selectedNft = nft*/ setNft(nft)}>
             <CustomLink to="/CreateFraction">
                 <img src={nft.image_url}></img>
-
+                    
             </CustomLink>
-            <p>{nft.name}</p>
+            <p>{nft. name} #{nft.token_id}</p>
         </Button>)
     }
 
@@ -39,8 +45,8 @@ function FractionaliseWallet() {
             <CustomLink to="/FractionNFT">Back</CustomLink>
             <Button onClick={getData}>Get Nfts</Button>
             </div>
-            {data.map(renderNfts)}
 
+            {data.map(renderNfts)}
         </nav>
     )
 

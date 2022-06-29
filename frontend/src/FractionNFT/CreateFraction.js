@@ -29,6 +29,7 @@ function CreateFraction() {
     }
 
     async function getInfo() {
+        console.log(selectedNft)
         console.log("contract address: " + JSON.stringify(selectedNft.asset_contract.address))
         console.log("token id: " + JSON.stringify(selectedNft.token_id))
     }
@@ -74,6 +75,7 @@ function CreateFraction() {
     }
 
     async function handleFractionNft() {
+
         if(window.ethereum) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
@@ -103,7 +105,8 @@ function CreateFraction() {
             <CustomLink to="/FractionaliseWallet">Back</CustomLink>
 
             <img src={selectedNft.image_url} />
-            <p>{selectedNft.name}</p>
+            <p>{selectedNft.name} #{selectedNft.token_id}</p>
+
             <Form>
                 <Form.Group>
                     <Form.Label>Fraction Token Name:</Form.Label>

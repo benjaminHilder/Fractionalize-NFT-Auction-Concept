@@ -11,6 +11,8 @@ import ActiveProposals from './Pages/Withdraw/ActiveProposals';
 import ActiveAuctions from './Pages/Withdraw/ActiveAuctions';
 import ProposalWallet from './Pages/Withdraw/ProposalWallet';
 import Withdraw from './Pages/Withdraw/Withdraw';
+import Stake from './Pages/Withdraw/Stake';
+import StakeWallet from './Pages/Withdraw/StakeWallet';
 import FractionaliseWallet from './FractionNFT/FractionaliseWallet';
 import ManualFractionalise from './FractionNFT/ManualFractionalise';
 import CreateFraction from './FractionNFT/CreateFraction';
@@ -42,6 +44,8 @@ function App() {
           <Route path="/ManualFractionalise" element={<ManualFractionalise />} />
           <Route path="/CreateFraction" element={<CreateFraction />} />
           <Route path="/CreatePool" element={<CreatePool /> } />
+          <Route path="/Stake" element={<Stake /> } />
+          <Route path="/StakeWallet" element={<StakeWallet /> } />
 
         </Routes>
       </div>
