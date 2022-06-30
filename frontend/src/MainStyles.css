@@ -1,5 +1,6 @@
 * {
     box-sizing: border-box;
+    list-style-type: none;
 }
 
 body {
@@ -24,12 +25,6 @@ body {
 .horizontalBlocks {
     display: inline-block;
   }
-
-.MintNft {
-    background-color: red;
-    color: orange;
-}
-
 
 .nav ul {
     padding: 0;

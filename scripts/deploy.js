@@ -23,18 +23,18 @@ async function main() {
   const storage = await Storage.deploy();
   await storage.deployed();
 
-  const Auction = await hre.ethers.getContractFactory("Auction");
-  const auction = await Auction.deploy(storage.address);
-  await auction.deployed();
+  //const Auction = await hre.ethers.getContractFactory("Auction");
+  //const auction = await Auction.deploy(storage.address);
+  //await auction.deployed();
 
-  const Nft = await hre.ethers.getContractFactory("NFT");
-  const nft = await Nft.deploy("Fractionalise Sample NFT", "FSNFT", "ipfs://QmaqgBZVuhQwkhrLs3WB9P9Aq5xReYN4h73mAmQzhSnncB/");
-  await nft.deployed();
+  //const Nft = await hre.ethers.getContractFactory("NFT");
+  //const nft = await Nft.deploy("Fractionalise Sample NFT", "FSNFT", "ipfs://QmU3ZrAPiv2JzjdhnpvZykW8Qi7EURv5RBsRGxPPaVFiqe/");
+  //await nft.deployed();
 
   //console.log("Greeter deployed to:", greeter.address);
   console.log("Storage address: " + storage.address);
-  console.log("Auction address: " + auction.address);
-  console.log("NFT address: " + nft.address);
+  //console.log("Auction address: " + auction.address);
+  //console.log("NFT address: " + nft.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

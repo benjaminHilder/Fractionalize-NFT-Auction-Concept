@@ -1,9 +1,9 @@
 import { React, useState} from "react"
-import 'bootstrap/dist/css/bootstrap.min.css'
+//import 'bootstrap/dist/css/bootstrap.min.css'
 import '../MainStyles.css'
 import { Button} from 'react-bootstrap'
 import { Link, useMatch, useResolvedPath} from "react-router-dom";
-import { connectedAddress } from "../Navbar.js"
+import { connectedAddress }  from "../Navbar.js"
 
 export let selectedNft
 
@@ -30,7 +30,7 @@ function FractionaliseWallet() {
         
     const renderNfts = (nft, index) => {
         return(<Button key={index}
-        onClick={/*() => selectedNft = nft*/ setNft(nft)}>
+        onClick={() => selectedNft = nft}>
             <CustomLink to="/CreateFraction">
                 <img src={nft.image_url}></img>
                     

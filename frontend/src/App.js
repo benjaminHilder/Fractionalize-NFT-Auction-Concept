@@ -15,14 +15,15 @@ import Stake from './Pages/Withdraw/Stake';
 import StakeWallet from './Pages/Withdraw/StakeWallet';
 import FractionaliseWallet from './FractionNFT/FractionaliseWallet';
 import ManualFractionalise from './FractionNFT/ManualFractionalise';
+
 import CreateFraction from './FractionNFT/CreateFraction';
 import CreatePool from './Pages/Trade/CreatePool';
 
 import { Route, Routes } from "react-router-dom";
 
-export const RinkebyStorageAddress = "0x7afd24cf6A16d55A3fcB36Cff5647B6B631781a6"
-export const RinkebyAuctionAddress = "0x324addF7A8AE7d0B61296f0943D90430722363bc"
-export const RinkebyNftAddress = "0x525616772d59a4A46Bd1Cda9643740Ca9E9B2E65"
+export const RinkebyStorageAddress = "0x6f06712c5CB637D71d26B0e639cD8689779D03F0"
+export const RinkebyAuctionAddress = "0x4802BacAd2cAcF01A699f6E27e06C0f37E294588"
+export const RinkebyNftAddress = "0x086B35a4047A1a7ea43a5bdFa253b9E16D73430D"
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/ProposalWallet" element={<ProposalWallet />} />
           <Route path="/Withdraw" element={<Withdraw />} />
           <Route path="/FractionaliseWallet" element={<FractionaliseWallet />} />
+          
           <Route path="/ManualFractionalise" element={<ManualFractionalise />} />
           <Route path="/CreateFraction" element={<CreateFraction />} />
           <Route path="/CreatePool" element={<CreatePool /> } />

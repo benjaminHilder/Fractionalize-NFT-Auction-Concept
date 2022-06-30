@@ -20,21 +20,22 @@ function CreateFraction() {
     const handleFractionTokenTickerChange = (event) => setFractionTokenTicker(event.target.value);
     const handleTokenSupplyChange = (event) => setTokenSupply(event.target.value);
     const handleTokenRoyaltyChange = (event) => setTokenRoyalty(event.target.value);
-
+    
     const etherScanApi = `https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${selectedNft.asset_contract.address}&apikey=QF41CVNJWPQBFG2WKQPSCW345TYU5WMTKY`
 
     const getAbi = async () => {
         let res = await axios.get(etherScanApi)
-        setNftAbi(JSON.parse(res.data.result))
+        setNftAbi(res.data.result)
     }
 
     async function getInfo() {
         console.log(selectedNft)
-        console.log("contract address: " + JSON.stringify(selectedNft.asset_contract.address))
-        console.log("token id: " + JSON.stringify(selectedNft.token_id))
+        console.log("contract address: " + selectedNft.asset_contract.address)
+        console.log("token id: " + selectedNft.token_id)
     }
     
     async function handleApproveNftContract() {
+        getInfo();
         if(window.ethereum) {
         getAbi()
          const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -46,6 +47,7 @@ function CreateFraction() {
             signer
         )
         try {
+
             const response = await contract.approve(RinkebyStorageAddress, selectedNft.token_id);
             console.log('response: ' + response);
         } catch (err) {
@@ -126,10 +128,6 @@ function CreateFraction() {
                             placeholder="Enter Fraction Token Royalty"
                             onChange={handleTokenRoyaltyChange}/>
                 </Form.Group>
-
-                <Button onClick={getInfo}>
-                get info
-                </Button>
 
                 <Button
                 onClick={handleApproveNftContract}>Approve Contract</Button>
