@@ -28,6 +28,10 @@ function WithdrawNFT() {
             <Button>Stake</Button>
         </CustomLink>
 
+        <CustomLink to ="/YourFractionedNFTsWallet">
+            <Button>Your Fractioned NFTs</Button>
+        </CustomLink>
+
     </div>
     )
 

@@ -93,7 +93,7 @@ function CreateFraction() {
                                                                BigNumber.from(selectedNft.token_id),
                                                                fractionTokenName.toString(),
                                                                fractionTokenTicker.toString(),
-                                                               /*BigInt(supplyString*/ BigNumber.from(tokenSupply),
+                                                               BigNumber.from(supplyString) /*BigNumber.from(tokenSupply)*/,
                                                                BigNumber.from(tokenRoyalty));
                 console.log('response: ', response);
             } catch (err) {
