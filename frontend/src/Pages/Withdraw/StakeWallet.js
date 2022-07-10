@@ -8,7 +8,6 @@ import { RinkebyStorageAddress } from '../../App';
 import Storage from '../../Json/Storage.json'
 
 export let selectedNft
-export let selectedNftAddress;
 
 function StakeWallet() {
     const [data, setData] = useState([])
@@ -65,14 +64,9 @@ function StakeWallet() {
         } 
     }
 
-    async function setNft(nft) {
-        //selectedNftAddress = nft.asset_contract.address
-        console.log("log: " + nft.asset_contract.address)
-    }
-
     const renderNfts = (nft, index) => {
         return(<Button key={index}
-        onClick={setNft(nft)}>
+        onClick={() => selectedNft = nft}>
             <CustomLink to="/Stake">
                 <img src={nft.image_url}></img>
 

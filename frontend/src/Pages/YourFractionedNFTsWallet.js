@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 //import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Alert} from 'react-bootstrap'
 import { ethers, BigNumber } from "ethers";
@@ -26,6 +26,9 @@ function YourFractionedNFTsWallet() {
          // console.log(data)
     }
 
+    useEffect(() => {
+
+    })
     async function setUserDepositedNfts() {
 
         getData();
